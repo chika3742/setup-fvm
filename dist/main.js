@@ -59443,7 +59443,10 @@ var tryExec = async (commandLine, options) => {
   const retryCount = 3;
   let trial = 1;
   while (true) {
-    const exitCode = await exec.exec(commandLine, [], options);
+    const exitCode = await exec.exec(commandLine, [], {
+      ...options,
+      failOnStdErr: false
+    });
     if (exitCode === 0) {
       return;
     }
