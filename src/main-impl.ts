@@ -42,14 +42,26 @@ export const mainRun = async () => {
       [`${os.homedir()}/.fvm/versions/${flutterVersion}`, `${os.homedir()}/.fvm/cache.git`],
       cacheKeys.flutterSdkCacheKey,
       cacheKeys.flutterSdkRestoreCacheKeys,
-    );
+    ).then((cacheHit) => {
+      if (cacheHit) {
+        core.info(`Flutter SDK cache found for version ${flutterVersion}: ${cacheHit}`);
+      } else {
+        core.info("No Flutter SDK cache found");
+      }
+    });
 
     // restore pub cache
     await cache.restoreCache(
       [`${os.homedir()}/.pub-cache`],
       cacheKeys.pubCacheKey,
       cacheKeys.pubRestoreCacheKeys,
-    )
+    ).then((cacheHit) => {
+      if (cacheHit) {
+        core.info(`Pub cache found: ${cacheHit}`);
+      } else {
+        core.info("No Pub cache found");
+      }
+    });
 
     await installFvm();
 

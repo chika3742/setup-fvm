@@ -20,13 +20,17 @@ export const postRun = async () => {
     await cache.saveCache(
       [`${homeDir}/.fvm/versions/${flutterVersion}`, `${homeDir}/.fvm/cache.git`],
       cacheKeys.flutterSdkCacheKey,
-    );
+    ).then(() => {
+      core.info(`Flutter SDK cache saved: ${cacheKeys.flutterSdkCacheKey}`);
+    });
 
     // save pub cache
     await cache.saveCache(
       [`${homeDir}/.pub-cache`],
       cacheKeys.pubCacheKey,
-    );
+    ).then(() => {
+      core.info(`Pub cache saved: ${cacheKeys.pubCacheKey}`);
+    });
   } catch (e) {
     core.setFailed((e as any).message);
   }
