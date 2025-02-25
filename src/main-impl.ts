@@ -37,6 +37,9 @@ export const mainRun = async () => {
 
     const cacheKeys = await getCacheKeys(workingDirectory);
 
+    console.log(`os.homedir: ${os.homedir()}`);
+    console.log(`HOME: ${process.env.HOME}`);
+
     // restore Flutter SDK cache
     await cache.restoreCache(
       [`${os.homedir()}/.fvm/versions/${flutterVersion}`, `${os.homedir()}/.fvm/cache.git`],
