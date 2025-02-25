@@ -1,0 +1,43 @@
+name: Build and Commit
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Run build
+        run: bun run build
+
+      - name: Commit and push changes
+        run: |
+          # Gitユーザ情報を設定
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          
+          # 全変更ファイルをステージ
+          git add .
+          
+          # 変更がある場合のみコミットしてpush
+          if ! git diff-index --quiet HEAD; then
+            git commit -m "chore: update build outputs [skip ci]"
+            git push
+          else
+            echo "No changes to commit."
+          fi
