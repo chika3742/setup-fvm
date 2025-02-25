@@ -45,7 +45,7 @@ const tryExec = async (commandLine: string, options?: exec.ExecOptions): Promise
 }
 
 const installFvm = async (): Promise<void> => {
-  const result = await Bun.fetch("https://fvm.app/install.sh")
+  const result = await fetch("https://fvm.app/install.sh")
   const buffer = await result.arrayBuffer()
   return tryExec("bash", { input: Buffer.from(buffer) });
 }

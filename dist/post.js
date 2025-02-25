@@ -12473,7 +12473,7 @@ var require_fetch = __commonJS((exports, module) => {
       this.emit("terminated", error);
     }
   }
-  function fetch(input, init = {}) {
+  function fetch2(input, init = {}) {
     webidl.argumentLengthCheck(arguments, 1, { header: "globalThis.fetch" });
     const p = createDeferredPromise();
     let requestObject;
@@ -13345,7 +13345,7 @@ var require_fetch = __commonJS((exports, module) => {
     }
   }
   module.exports = {
-    fetch,
+    fetch: fetch2,
     Fetch,
     fetching,
     finalizeAndReportTiming
@@ -59447,7 +59447,7 @@ var tryExec = async (commandLine, options) => {
   }
 };
 var installFvm = async () => {
-  const result = await Bun.fetch("https://fvm.app/install.sh");
+  const result = await fetch("https://fvm.app/install.sh");
   const buffer = await result.arrayBuffer();
   return tryExec("bash", { input: Buffer.from(buffer) });
 };
