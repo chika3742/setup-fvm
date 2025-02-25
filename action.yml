@@ -1,0 +1,14 @@
+name: setup-fvm
+description: An action installs and caches FVM, Flutter SDK, and dependencies using FVM.
+author: cq
+
+inputs:
+  working-directory:
+    description: The root directory of the Flutter project.
+    required: false
+    default: "."
+
+runs:
+  using: node20
+  main: dist/main.ts
+  post: dist/post.ts
