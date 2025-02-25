@@ -29,13 +29,13 @@ export const getCacheKeys = async (workingDirectory: string): Promise<CacheKeys>
   }
 }
 
-const tryExec = async (commandLine: string): Promise<void> => {
+const tryExec = async (commandLine: string, options?: exec.ExecOptions): Promise<void> => {
   const retryCount = 3;
 
   let trial = 1;
 
   while (true) {
-    const exitCode = await exec.exec(commandLine);
+    const exitCode = await exec.exec(commandLine, [], options);
     if (exitCode === 0) {
       return; // complete function
     }
@@ -44,8 +44,10 @@ const tryExec = async (commandLine: string): Promise<void> => {
   }
 }
 
-const installFvm = (): Promise<void> => {
-  return tryExec("curl -fsSL https://fvm.app/install.sh | bash");
+const installFvm = async (): Promise<void> => {
+  const result = await Bun.fetch("https://fvm.app/install.sh")
+  const buffer = await result.arrayBuffer()
+  return tryExec("bash", { input: Buffer.from(buffer) });
 }
 
 const main = async () => {
