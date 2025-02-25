@@ -17,6 +17,11 @@ export const postRun = async () => {
     const cacheKeys = await getCacheKeys(workingDirectory);
     const flutterVersion = await getFlutterVersion(workingDirectory);
 
+    core.info(`cache paths: ${[
+      path.join(homeDir, ".fvm/versions", flutterVersion),
+      path.join(homeDir, ".fvm/cache.git"),
+    ]}`)
+
     // save Flutter SDK cache
     await cache.saveCache(
       [
