@@ -59478,16 +59478,12 @@ var mainRun = async () => {
       path2.join(homeDir, "fvm/versions", flutterVersion),
       path2.join(homeDir, "fvm/cache.git")
     ], cacheKeys.flutterSdkCacheKey, cacheKeys.flutterSdkRestoreCacheKeys).then((cacheHit) => {
-      if (cacheHit) {
-        core.info(`Flutter SDK cache found for version ${flutterVersion}: ${cacheHit}`);
-      } else {
+      if (!cacheHit) {
         core.info("No Flutter SDK cache found");
       }
     });
     await cache.restoreCache([path2.join(homeDir, ".pub-cache")], cacheKeys.pubCacheKey, cacheKeys.pubRestoreCacheKeys).then((cacheHit) => {
-      if (cacheHit) {
-        core.info(`Pub cache found: ${cacheHit}`);
-      } else {
+      if (!cacheHit) {
         core.info("No Pub cache found");
       }
     });
