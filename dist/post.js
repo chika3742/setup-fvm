@@ -59436,6 +59436,7 @@ var getCacheKeys = async (workingDirectory) => {
 };
 
 // src/post-impl.ts
+import path2 from "path";
 var postRun = async () => {
   try {
     const fvmUseSuccess = core.getState("fvm-use-success");
@@ -59447,10 +59448,13 @@ var postRun = async () => {
     const workingDirectory = core.getInput("working-directory");
     const cacheKeys = await getCacheKeys(workingDirectory);
     const flutterVersion = await getFlutterVersion(workingDirectory);
-    await cache.saveCache([`${homeDir}/.fvm/versions/${flutterVersion}`, `${homeDir}/.fvm/cache.git`], cacheKeys.flutterSdkCacheKey).then(() => {
+    await cache.saveCache([
+      path2.join(homeDir, ".fvm/versions", flutterVersion),
+      path2.join(homeDir, ".fvm/cache.git")
+    ], cacheKeys.flutterSdkCacheKey).then(() => {
       core.info(`Flutter SDK cache saved: ${cacheKeys.flutterSdkCacheKey}`);
     });
-    await cache.saveCache([`${homeDir}/.pub-cache`], cacheKeys.pubCacheKey).then(() => {
+    await cache.saveCache([path2.join(homeDir, ".pub-cache")], cacheKeys.pubCacheKey).then(() => {
       core.info(`Pub cache saved: ${cacheKeys.pubCacheKey}`);
     });
   } catch (e) {

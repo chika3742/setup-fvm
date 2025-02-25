@@ -59416,7 +59416,6 @@ var require_glob2 = __commonJS((exports) => {
 var core = __toESM(require_core(), 1);
 var cache = __toESM(require_cache3(), 1);
 var exec = __toESM(require_exec(), 1);
-import * as os from "node:os";
 
 // src/utils/cache-keys.ts
 var glob = __toESM(require_glob2(), 1);
@@ -59438,6 +59437,8 @@ var getCacheKeys = async (workingDirectory) => {
 };
 
 // src/main-impl.ts
+import path2 from "path";
+var homeDir = process.env.HOME;
 var tryExec = async (commandLine, options) => {
   const retryCount = 3;
   let trial = 1;
@@ -59463,16 +59464,17 @@ var mainRun = async () => {
       core.setFailed("Cache is not available");
     }
     const cacheKeys = await getCacheKeys(workingDirectory);
-    console.log(`os.homedir: ${os.homedir()}`);
-    console.log(`HOME: ${process.env.HOME}`);
-    await cache.restoreCache([`${os.homedir()}/.fvm/versions/${flutterVersion}`, `${os.homedir()}/.fvm/cache.git`], cacheKeys.flutterSdkCacheKey, cacheKeys.flutterSdkRestoreCacheKeys).then((cacheHit) => {
+    await cache.restoreCache([
+      path2.join(homeDir, ".fvm/versions", flutterVersion),
+      path2.join(homeDir, ".fvm/cache.git")
+    ], cacheKeys.flutterSdkCacheKey, cacheKeys.flutterSdkRestoreCacheKeys).then((cacheHit) => {
       if (cacheHit) {
         core.info(`Flutter SDK cache found for version ${flutterVersion}: ${cacheHit}`);
       } else {
         core.info("No Flutter SDK cache found");
       }
     });
-    await cache.restoreCache([`${os.homedir()}/.pub-cache`], cacheKeys.pubCacheKey, cacheKeys.pubRestoreCacheKeys).then((cacheHit) => {
+    await cache.restoreCache([path2.join(homeDir, ".pub-cache")], cacheKeys.pubCacheKey, cacheKeys.pubRestoreCacheKeys).then((cacheHit) => {
       if (cacheHit) {
         core.info(`Pub cache found: ${cacheHit}`);
       } else {
