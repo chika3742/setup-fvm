@@ -12,7 +12,10 @@ const tryExec = async (commandLine: string, options?: exec.ExecOptions): Promise
   let trial = 1;
 
   while (true) {
-    const exitCode = await exec.exec(commandLine, [], options);
+    const exitCode = await exec.exec(commandLine, [], {
+      ...options,
+      failOnStdErr: false,
+    });
     if (exitCode === 0) {
       return; // complete function
     }
