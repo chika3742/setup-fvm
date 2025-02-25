@@ -3,31 +3,14 @@ import * as cache from '@actions/cache';
 import * as exec from '@actions/exec';
 import { getCacheKeys, getFlutterVersion } from "./utils/cache-keys.ts";
 import path from "path";
+import { execWithRetry } from "./utils/exec-with-retry.ts";
 
 const homeDir = process.env.HOME!;
-
-const tryExec = async (commandLine: string, options?: exec.ExecOptions): Promise<void> => {
-  const retryCount = 3;
-
-  let trial = 1;
-
-  while (true) {
-    const exitCode = await exec.exec(commandLine, [], {
-      ...options,
-      failOnStdErr: false,
-    });
-    if (exitCode === 0) {
-      return; // complete function
-    }
-    console.error(`Failed to execute "${commandLine}". Retrying...(${trial} of ${retryCount})`);
-    trial++;
-  }
-}
 
 const installFvm = async (): Promise<void> => {
   const result = await fetch("https://fvm.app/install.sh")
   const buffer = await result.arrayBuffer()
-  return tryExec("bash", { input: Buffer.from(buffer) });
+  return execWithRetry("bash", { input: Buffer.from(buffer) });
 }
 
 export const mainRun = async () => {
