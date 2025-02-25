@@ -59434,11 +59434,11 @@ var getCacheKeys = async (workingDirectory) => {
     pubRestoreCacheKeys: [`${runnerOs}-pub-`]
   };
 };
-var tryExec = async (commandLine) => {
+var tryExec = async (commandLine, options) => {
   const retryCount = 3;
   let trial = 1;
   while (true) {
-    const exitCode = await exec.exec(commandLine);
+    const exitCode = await exec.exec(commandLine, [], options);
     if (exitCode === 0) {
       return;
     }
@@ -59446,8 +59446,10 @@ var tryExec = async (commandLine) => {
     trial++;
   }
 };
-var installFvm = () => {
-  return tryExec("curl -fsSL https://fvm.app/install.sh | bash");
+var installFvm = async () => {
+  const result = await Bun.fetch("https://fvm.app/install.sh");
+  const buffer = await result.arrayBuffer();
+  return tryExec("bash", { input: Buffer.from(buffer) });
 };
 var main = async () => {
   try {
