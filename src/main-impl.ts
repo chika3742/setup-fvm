@@ -33,9 +33,7 @@ export const mainRun = async () => {
       cacheKeys.flutterSdkCacheKey,
       cacheKeys.flutterSdkRestoreCacheKeys,
     ).then((cacheHit) => {
-      if (cacheHit) {
-        core.info(`Flutter SDK cache found for version ${flutterVersion}: ${cacheHit}`);
-      } else {
+      if (!cacheHit) {
         core.info("No Flutter SDK cache found");
       }
     });
@@ -46,9 +44,7 @@ export const mainRun = async () => {
       cacheKeys.pubCacheKey,
       cacheKeys.pubRestoreCacheKeys,
     ).then((cacheHit) => {
-      if (cacheHit) {
-        core.info(`Pub cache found: ${cacheHit}`);
-      } else {
+      if (!cacheHit) {
         core.info("No Pub cache found");
       }
     });
