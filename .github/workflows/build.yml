@@ -23,7 +23,9 @@ jobs:
         uses: oven-sh/setup-bun@v2
 
       - name: Run build
-        run: bun run build
+        run: |
+          bun install
+          bun run build
 
       - name: Commit and push changes
         run: |
