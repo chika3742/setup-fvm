@@ -1,15 +1,12 @@
 # setup-fvm
 
-To install dependencies:
+This action does:
+- Install FVM
+- Install Flutter SDK and dependencies in pubspec (running `fvm use`)
+- Cache Flutter SDK and Pub packages
 
-```bash
-bun install
-```
+## Inputs
 
-To run:
+### `working-directory`
 
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.2.3. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+**Optional** The working directory where the Flutter project is located. Default is `.`.
