@@ -5,8 +5,9 @@ import { getCacheKeys, getFlutterVersion } from "./main.ts";
 const main = async () => {
   try {
     const fvmUseSuccess = core.getState("fvm-use-success");
-    if (fvmUseSuccess === "false") {
+    if (fvmUseSuccess !== "true") {
       core.info("Saving cache is skipped because initializing FVM failed.");
+      return;
     }
 
     const homeDir = process.env.HOME;
