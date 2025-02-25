@@ -44,8 +44,8 @@ export const mainRun = async () => {
     // restore Flutter SDK cache
     await cache.restoreCache(
       [
-        path.join(homeDir, ".fvm/versions", flutterVersion),
-        path.join(homeDir, ".fvm/cache.git"),
+        path.join(homeDir, "fvm/versions", flutterVersion),
+        path.join(homeDir, "fvm/cache.git"),
       ],
       cacheKeys.flutterSdkCacheKey,
       cacheKeys.flutterSdkRestoreCacheKeys,
