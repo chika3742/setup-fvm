@@ -17,10 +17,11 @@ interface CacheKeys {
 
 export const getCacheKeys = async (workingDirectory: string): Promise<CacheKeys> => {
   const runnerOs = process.env.RUNNER_OS;
+  const workspaceDir = process.env.GITHUB_WORKSPACE!;
   return {
     flutterSdkCacheKey: `${runnerOs}-flutter-${await getFlutterVersion(workingDirectory)}`,
     flutterSdkRestoreCacheKeys: [`${runnerOs}-flutter-`],
-    pubCacheKey: `${runnerOs}-pub-${await glob.hashFiles("**/pubspec.lock", workingDirectory)}`,
+    pubCacheKey: `${runnerOs}-pub-${await glob.hashFiles("**/pubspec.lock", path.resolve(workspaceDir, workingDirectory))}`,
     pubRestoreCacheKeys: [`${runnerOs}-pub-`],
   }
 }
