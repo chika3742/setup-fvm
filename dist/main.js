@@ -59468,8 +59468,8 @@ var mainRun = async () => {
     }
     const cacheKeys = await getCacheKeys(workingDirectory);
     await cache.restoreCache([
-      path2.join(homeDir, ".fvm/versions", flutterVersion),
-      path2.join(homeDir, ".fvm/cache.git")
+      path2.join(homeDir, "fvm/versions", flutterVersion),
+      path2.join(homeDir, "fvm/cache.git")
     ], cacheKeys.flutterSdkCacheKey, cacheKeys.flutterSdkRestoreCacheKeys).then((cacheHit) => {
       if (cacheHit) {
         core.info(`Flutter SDK cache found for version ${flutterVersion}: ${cacheHit}`);

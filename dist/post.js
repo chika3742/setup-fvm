@@ -59448,13 +59448,9 @@ var postRun = async () => {
     const workingDirectory = core.getInput("working-directory");
     const cacheKeys = await getCacheKeys(workingDirectory);
     const flutterVersion = await getFlutterVersion(workingDirectory);
-    core.info(`cache paths: ${[
-      path2.join(homeDir, ".fvm/versions", flutterVersion),
-      path2.join(homeDir, ".fvm/cache.git")
-    ]}`);
     await cache.saveCache([
-      path2.join(homeDir, ".fvm/versions", flutterVersion),
-      path2.join(homeDir, ".fvm/cache.git")
+      path2.join(homeDir, "fvm/versions", flutterVersion),
+      path2.join(homeDir, "fvm/cache.git")
     ], cacheKeys.flutterSdkCacheKey).then(() => {
       core.info(`Flutter SDK cache saved: ${cacheKeys.flutterSdkCacheKey}`);
     });
