@@ -5,6 +5,19 @@ This action does:
 - Install Flutter SDK and dependencies in pubspec (running `fvm use`)
 - Cache Flutter SDK and Pub packages
 
+## Usage
+
+```YAML
+# ...
+jobs:
+  foo:
+    # ...
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: chika3742/setup-fvm@master
+```
+
 ## Inputs
 
 ### `working-directory`
