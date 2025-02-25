@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
 import * as cache from '@actions/cache';
 import { getCacheKeys, getFlutterVersion } from "./utils/cache-keys.ts";
+import path from "path";
 
 export const postRun = async () => {
   try {
@@ -10,7 +11,7 @@ export const postRun = async () => {
       return;
     }
 
-    const homeDir = process.env.HOME;
+    const homeDir = process.env.HOME!;
 
     const workingDirectory = core.getInput('working-directory');
     const cacheKeys = await getCacheKeys(workingDirectory);
@@ -18,7 +19,10 @@ export const postRun = async () => {
 
     // save Flutter SDK cache
     await cache.saveCache(
-      [`${homeDir}/.fvm/versions/${flutterVersion}`, `${homeDir}/.fvm/cache.git`],
+      [
+        path.join(homeDir, ".fvm/versions", flutterVersion),
+        path.join(homeDir, ".fvm/cache.git"),
+      ],
       cacheKeys.flutterSdkCacheKey,
     ).then(() => {
       core.info(`Flutter SDK cache saved: ${cacheKeys.flutterSdkCacheKey}`);
@@ -26,7 +30,7 @@ export const postRun = async () => {
 
     // save pub cache
     await cache.saveCache(
-      [`${homeDir}/.pub-cache`],
+      [path.join(homeDir, ".pub-cache")],
       cacheKeys.pubCacheKey,
     ).then(() => {
       core.info(`Pub cache saved: ${cacheKeys.pubCacheKey}`);

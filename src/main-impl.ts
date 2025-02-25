@@ -1,8 +1,10 @@
 import * as core from '@actions/core';
 import * as cache from '@actions/cache';
 import * as exec from '@actions/exec';
-import * as os from "node:os";
 import { getCacheKeys, getFlutterVersion } from "./utils/cache-keys.ts";
+import path from "path";
+
+const homeDir = process.env.HOME!;
 
 const tryExec = async (commandLine: string, options?: exec.ExecOptions): Promise<void> => {
   const retryCount = 3;
@@ -34,15 +36,14 @@ export const mainRun = async () => {
     if (!cache.isFeatureAvailable()) {
       core.setFailed('Cache is not available');
     }
-
     const cacheKeys = await getCacheKeys(workingDirectory);
-
-    console.log(`os.homedir: ${os.homedir()}`);
-    console.log(`HOME: ${process.env.HOME}`);
 
     // restore Flutter SDK cache
     await cache.restoreCache(
-      [`${os.homedir()}/.fvm/versions/${flutterVersion}`, `${os.homedir()}/.fvm/cache.git`],
+      [
+        path.join(homeDir, ".fvm/versions", flutterVersion),
+        path.join(homeDir, ".fvm/cache.git"),
+      ],
       cacheKeys.flutterSdkCacheKey,
       cacheKeys.flutterSdkRestoreCacheKeys,
     ).then((cacheHit) => {
@@ -55,7 +56,7 @@ export const mainRun = async () => {
 
     // restore pub cache
     await cache.restoreCache(
-      [`${os.homedir()}/.pub-cache`],
+      [path.join(homeDir, ".pub-cache")],
       cacheKeys.pubCacheKey,
       cacheKeys.pubRestoreCacheKeys,
     ).then((cacheHit) => {
