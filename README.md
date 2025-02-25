@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: chika3742/setup-fvm@master
+      - uses: chika3742/setup-fvm@main
 ```
 
 ## Inputs
