@@ -59412,14 +59412,16 @@ var require_glob2 = __commonJS((exports) => {
   exports.hashFiles = hashFiles;
 });
 
-// src/main.ts
+// src/main-impl.ts
 var core = __toESM(require_core(), 1);
 var cache = __toESM(require_cache3(), 1);
-var glob = __toESM(require_glob2(), 1);
 var exec = __toESM(require_exec(), 1);
-import * as path from "path";
-import * as fs from "fs/promises";
 import * as os from "node:os";
+
+// src/utils/cache-keys.ts
+var glob = __toESM(require_glob2(), 1);
+import path from "path";
+import fs from "fs/promises";
 var getFlutterVersion = async (workingDirectory) => {
   const fvmrcPath = path.resolve(process.env.GITHUB_WORKSPACE, workingDirectory, ".fvmrc");
   const fvmrcContent = await fs.readFile(fvmrcPath, "utf-8");
@@ -59434,6 +59436,8 @@ var getCacheKeys = async (workingDirectory) => {
     pubRestoreCacheKeys: [`${runnerOs}-pub-`]
   };
 };
+
+// src/main-impl.ts
 var tryExec = async (commandLine, options) => {
   const retryCount = 3;
   let trial = 1;
@@ -59451,7 +59455,7 @@ var installFvm = async () => {
   const buffer = await result.arrayBuffer();
   return tryExec("bash", { input: Buffer.from(buffer) });
 };
-var main = async () => {
+var mainRun = async () => {
   try {
     const workingDirectory = core.getInput("working-directory");
     const flutterVersion = await getFlutterVersion(workingDirectory);
@@ -59468,8 +59472,6 @@ var main = async () => {
     core.setFailed(e.message);
   }
 };
-await main();
-export {
-  getFlutterVersion,
-  getCacheKeys
-};
+
+// src/main.ts
+await mainRun();

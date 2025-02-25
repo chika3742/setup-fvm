@@ -12473,7 +12473,7 @@ var require_fetch = __commonJS((exports, module) => {
       this.emit("terminated", error);
     }
   }
-  function fetch2(input, init = {}) {
+  function fetch(input, init = {}) {
     webidl.argumentLengthCheck(arguments, 1, { header: "globalThis.fetch" });
     const p = createDeferredPromise();
     let requestObject;
@@ -13345,7 +13345,7 @@ var require_fetch = __commonJS((exports, module) => {
     }
   }
   module.exports = {
-    fetch: fetch2,
+    fetch,
     Fetch,
     fetching,
     finalizeAndReportTiming
@@ -59412,14 +59412,14 @@ var require_glob2 = __commonJS((exports) => {
   exports.hashFiles = hashFiles;
 });
 
-// src/main.ts
+// src/post-impl.ts
 var core = __toESM(require_core(), 1);
 var cache = __toESM(require_cache3(), 1);
+
+// src/utils/cache-keys.ts
 var glob = __toESM(require_glob2(), 1);
-var exec = __toESM(require_exec(), 1);
-import * as path from "path";
-import * as fs from "fs/promises";
-import * as os from "node:os";
+import path from "path";
+import fs from "fs/promises";
 var getFlutterVersion = async (workingDirectory) => {
   const fvmrcPath = path.resolve(process.env.GITHUB_WORKSPACE, workingDirectory, ".fvmrc");
   const fvmrcContent = await fs.readFile(fvmrcPath, "utf-8");
@@ -59434,60 +59434,25 @@ var getCacheKeys = async (workingDirectory) => {
     pubRestoreCacheKeys: [`${runnerOs}-pub-`]
   };
 };
-var tryExec = async (commandLine, options) => {
-  const retryCount = 3;
-  let trial = 1;
-  while (true) {
-    const exitCode = await exec.exec(commandLine, [], options);
-    if (exitCode === 0) {
+
+// src/post-impl.ts
+var postRun = async () => {
+  try {
+    const fvmUseSuccess = core.getState("fvm-use-success");
+    if (fvmUseSuccess !== "true") {
+      core.info("Saving cache is skipped because initializing FVM failed.");
       return;
     }
-    console.error(`Failed to execute "${commandLine}". Retrying...(${trial} of ${retryCount})`);
-    trial++;
-  }
-};
-var installFvm = async () => {
-  const result = await fetch("https://fvm.app/install.sh");
-  const buffer = await result.arrayBuffer();
-  return tryExec("bash", { input: Buffer.from(buffer) });
-};
-var main = async () => {
-  try {
+    const homeDir = process.env.HOME;
     const workingDirectory = core.getInput("working-directory");
-    const flutterVersion = await getFlutterVersion(workingDirectory);
-    if (!cache.isFeatureAvailable()) {
-      core.setFailed("Cache is not available");
-    }
     const cacheKeys = await getCacheKeys(workingDirectory);
-    await cache.restoreCache([`${os.homedir()}/.fvm/versions/${flutterVersion}`, `${os.homedir()}/.fvm/cache.git`], cacheKeys.flutterSdkCacheKey, cacheKeys.flutterSdkRestoreCacheKeys);
-    await cache.restoreCache([`${os.homedir()}/.pub-cache`], cacheKeys.pubCacheKey, cacheKeys.pubRestoreCacheKeys);
-    await installFvm();
-    const fvmUseExitCode = await exec.exec("fvm use");
-    core.saveState("fvm-use-success", fvmUseExitCode === 0);
+    const flutterVersion = await getFlutterVersion(workingDirectory);
+    await cache.saveCache([`${homeDir}/.fvm/versions/${flutterVersion}`, `${homeDir}/.fvm/cache.git`], cacheKeys.flutterSdkCacheKey);
+    await cache.saveCache([`${homeDir}/.pub-cache`], cacheKeys.pubCacheKey);
   } catch (e) {
     core.setFailed(e.message);
   }
 };
-await main();
 
 // src/post.ts
-var core2 = __toESM(require_core(), 1);
-var cache2 = __toESM(require_cache3(), 1);
-var main2 = async () => {
-  try {
-    const fvmUseSuccess = core2.getState("fvm-use-success");
-    if (fvmUseSuccess !== "true") {
-      core2.info("Saving cache is skipped because initializing FVM failed.");
-      return;
-    }
-    const homeDir = process.env.HOME;
-    const workingDirectory = core2.getInput("working-directory");
-    const cacheKeys = await getCacheKeys(workingDirectory);
-    const flutterVersion = await getFlutterVersion(workingDirectory);
-    await cache2.saveCache([`${homeDir}/.fvm/versions/${flutterVersion}`, `${homeDir}/.fvm/cache.git`], cacheKeys.flutterSdkCacheKey);
-    await cache2.saveCache([`${homeDir}/.pub-cache`], cacheKeys.pubCacheKey);
-  } catch (e) {
-    core2.setFailed(e.message);
-  }
-};
-await main2();
+await postRun();
