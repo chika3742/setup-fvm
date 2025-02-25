@@ -59415,7 +59415,7 @@ var require_glob2 = __commonJS((exports) => {
 // src/main-impl.ts
 var core = __toESM(require_core(), 1);
 var cache = __toESM(require_cache3(), 1);
-var exec = __toESM(require_exec(), 1);
+var exec3 = __toESM(require_exec(), 1);
 
 // src/utils/cache-keys.ts
 var glob = __toESM(require_glob2(), 1);
@@ -59438,9 +59438,11 @@ var getCacheKeys = async (workingDirectory) => {
 
 // src/main-impl.ts
 import path2 from "path";
-var homeDir = process.env.HOME;
-var tryExec = async (commandLine, options) => {
-  const retryCount = 3;
+
+// src/utils/exec-with-retry.ts
+var exec = __toESM(require_exec(), 1);
+var sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+var execWithRetry = async (commandLine, options, retryCount = 3, retryInterval = 10) => {
   let trial = 1;
   while (true) {
     const exitCode = await exec.exec(commandLine, [], {
@@ -59451,13 +59453,17 @@ var tryExec = async (commandLine, options) => {
       return;
     }
     console.error(`Failed to execute "${commandLine}". Retrying...(${trial} of ${retryCount})`);
+    await sleep(retryInterval * 1000);
     trial++;
   }
 };
+
+// src/main-impl.ts
+var homeDir = process.env.HOME;
 var installFvm = async () => {
   const result = await fetch("https://fvm.app/install.sh");
   const buffer = await result.arrayBuffer();
-  return tryExec("bash", { input: Buffer.from(buffer) });
+  return execWithRetry("bash", { input: Buffer.from(buffer) });
 };
 var mainRun = async () => {
   try {
@@ -59485,7 +59491,7 @@ var mainRun = async () => {
       }
     });
     await installFvm();
-    const fvmUseExitCode = await exec.exec("fvm use");
+    const fvmUseExitCode = await exec3.exec("fvm use");
     core.saveState("fvm-use-success", fvmUseExitCode === 0);
   } catch (e) {
     core.setFailed(e.message);
