@@ -59447,8 +59447,12 @@ var postRun = async () => {
     const workingDirectory = core.getInput("working-directory");
     const cacheKeys = await getCacheKeys(workingDirectory);
     const flutterVersion = await getFlutterVersion(workingDirectory);
-    await cache.saveCache([`${homeDir}/.fvm/versions/${flutterVersion}`, `${homeDir}/.fvm/cache.git`], cacheKeys.flutterSdkCacheKey);
-    await cache.saveCache([`${homeDir}/.pub-cache`], cacheKeys.pubCacheKey);
+    await cache.saveCache([`${homeDir}/.fvm/versions/${flutterVersion}`, `${homeDir}/.fvm/cache.git`], cacheKeys.flutterSdkCacheKey).then(() => {
+      core.info(`Flutter SDK cache saved: ${cacheKeys.flutterSdkCacheKey}`);
+    });
+    await cache.saveCache([`${homeDir}/.pub-cache`], cacheKeys.pubCacheKey).then(() => {
+      core.info(`Pub cache saved: ${cacheKeys.pubCacheKey}`);
+    });
   } catch (e) {
     core.setFailed(e.message);
   }

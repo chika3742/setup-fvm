@@ -59463,8 +59463,22 @@ var mainRun = async () => {
       core.setFailed("Cache is not available");
     }
     const cacheKeys = await getCacheKeys(workingDirectory);
-    await cache.restoreCache([`${os.homedir()}/.fvm/versions/${flutterVersion}`, `${os.homedir()}/.fvm/cache.git`], cacheKeys.flutterSdkCacheKey, cacheKeys.flutterSdkRestoreCacheKeys);
-    await cache.restoreCache([`${os.homedir()}/.pub-cache`], cacheKeys.pubCacheKey, cacheKeys.pubRestoreCacheKeys);
+    console.log(`os.homedir: ${os.homedir()}`);
+    console.log(`HOME: ${process.env.HOME}`);
+    await cache.restoreCache([`${os.homedir()}/.fvm/versions/${flutterVersion}`, `${os.homedir()}/.fvm/cache.git`], cacheKeys.flutterSdkCacheKey, cacheKeys.flutterSdkRestoreCacheKeys).then((cacheHit) => {
+      if (cacheHit) {
+        core.info(`Flutter SDK cache found for version ${flutterVersion}: ${cacheHit}`);
+      } else {
+        core.info("No Flutter SDK cache found");
+      }
+    });
+    await cache.restoreCache([`${os.homedir()}/.pub-cache`], cacheKeys.pubCacheKey, cacheKeys.pubRestoreCacheKeys).then((cacheHit) => {
+      if (cacheHit) {
+        core.info(`Pub cache found: ${cacheHit}`);
+      } else {
+        core.info("No Pub cache found");
+      }
+    });
     await installFvm();
     const fvmUseExitCode = await exec.exec("fvm use");
     core.saveState("fvm-use-success", fvmUseExitCode === 0);
