@@ -1,6 +1,8 @@
 name: setup-fvm
 description: An action installs and caches FVM, Flutter SDK, and dependencies using FVM.
 author: cq
+color: blue
+icon: arrow-down-circle
 
 inputs:
   working-directory:
