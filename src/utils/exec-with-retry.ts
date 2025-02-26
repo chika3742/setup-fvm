@@ -21,8 +21,13 @@ export const execWithRetry = async (commandLine: string, options: exec.ExecOptio
     if (exitCode === 0) {
       return; // complete function
     }
-    console.error(`Failed to execute "${commandLine}". Retrying...(${trial} of ${retryCount})`);
-    await sleep(retryInterval * 1000);
+    if (trial >= retryCount) {
+      throw new Error(`Failed to execute "${commandLine}" in ${retryCount} trials.`);
+    }
+
+    // retry
     trial++;
+    console.error(`Failed to execute "${commandLine}". Retrying...(${trial} of ${retryCount})`);
+    await sleep(retryInterval * 1000); // interval
   }
 }
