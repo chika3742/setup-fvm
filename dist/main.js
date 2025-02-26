@@ -59453,9 +59453,12 @@ var execWithRetry = async (commandLine, options, retryCount = 3, retryInterval =
     if (exitCode === 0) {
       return;
     }
+    if (trial >= retryCount) {
+      throw new Error(`Failed to execute "${commandLine}" in ${retryCount} trials.`);
+    }
+    trial++;
     console.error(`Failed to execute "${commandLine}". Retrying...(${trial} of ${retryCount})`);
     await sleep(retryInterval * 1000);
-    trial++;
   }
 };
 
