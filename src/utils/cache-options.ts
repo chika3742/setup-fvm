@@ -13,11 +13,19 @@ const workspaceDir = process.env.GITHUB_WORKSPACE!;
  */
 export const getFlutterVersion = async (projectDir: string): Promise<string> => {
   const fvmrcPath = path.join(workspaceDir, projectDir, ".fvmrc");
-  if (!await fs.exists(fvmrcPath)) {
-    throw new Error(".fvmrc was not found. Make sure project-dir is set properly.");
+  let fvmrcContent: string;
+  // read the content of .fvmrc
+  try {
+    fvmrcContent = await fs.readFile(fvmrcPath, 'utf-8');
+  } catch (e) {
+    throw new Error("Failed to read .fvmrc file. Make sure project-dir is set properly.", { cause: e });
   }
-  const fvmrcContent = await fs.readFile(fvmrcPath, 'utf-8');
-  return JSON.parse(fvmrcContent).flutter;
+  // parse fvmrc and return the version
+  try {
+    return JSON.parse(fvmrcContent).flutter;
+  } catch (e) {
+    throw new Error("Failed to parse .fvmrc. Make sure the file is valid JSON.", { cause: e });
+  }
 }
 
 export interface CacheOptions {
