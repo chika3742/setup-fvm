@@ -59421,18 +59421,19 @@ var exec3 = __toESM(require_exec(), 1);
 var glob = __toESM(require_glob2(), 1);
 import path from "path";
 import fs from "fs/promises";
-var getFlutterVersion = async (workingDirectory) => {
-  const fvmrcPath = path.resolve(process.env.GITHUB_WORKSPACE, workingDirectory, ".fvmrc");
+var getFlutterVersion = async (fvmrcPath) => {
+  const workspaceDir = process.env.GITHUB_WORKSPACE;
+  fvmrcPath = path.resolve(workspaceDir, fvmrcPath);
   const fvmrcContent = await fs.readFile(fvmrcPath, "utf-8");
   return JSON.parse(fvmrcContent).flutter;
 };
-var getCacheKeys = async (workingDirectory) => {
+var getCacheKeys = async (flutterProjectDir, flutterVersion) => {
   const runnerOs = process.env.RUNNER_OS;
   const workspaceDir = process.env.GITHUB_WORKSPACE;
   return {
-    flutterSdkCacheKey: `${runnerOs}-flutter-${await getFlutterVersion(workingDirectory)}`,
+    flutterSdkCacheKey: `${runnerOs}-flutter-${flutterVersion}`,
     flutterSdkRestoreCacheKeys: [`${runnerOs}-flutter-`],
-    pubCacheKey: `${runnerOs}-pub-${await glob.hashFiles("**/pubspec.lock", path.resolve(workspaceDir, workingDirectory))}`,
+    pubCacheKey: `${runnerOs}-pub-${await glob.hashFiles("**/pubspec.lock", path.resolve(workspaceDir, flutterProjectDir))}`,
     pubRestoreCacheKeys: [`${runnerOs}-pub-`]
   };
 };
@@ -59443,21 +59444,22 @@ import path2 from "path";
 // src/utils/exec-with-retry.ts
 var exec = __toESM(require_exec(), 1);
 var sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-var execWithRetry = async (commandLine, options, retryCount = 3, retryInterval = 10) => {
-  let trial = 1;
+var execWithRetry = async (commandLine, options, failureMessage, retryCount = 3, retryInterval = 5) => {
+  const attemptFailureMessage = failureMessage ?? `Failed to execute "${commandLine}".`;
+  let attempt = 1;
   while (true) {
     const exitCode = await exec.exec(commandLine, [], {
       ...options,
-      failOnStdErr: false
+      ignoreReturnCode: true
     });
     if (exitCode === 0) {
       return;
     }
-    if (trial >= retryCount) {
-      throw new Error(`Failed to execute "${commandLine}" in ${retryCount} trials.`);
+    if (attempt >= retryCount) {
+      throw new Error(`${attemptFailureMessage} in ${retryCount} attempts.`);
     }
-    trial++;
-    console.error(`Failed to execute "${commandLine}". Retrying...(${trial} of ${retryCount})`);
+    attempt++;
+    console.error(`${attemptFailureMessage} Retrying...(${attempt} of ${retryCount})`);
     await sleep(retryInterval * 1000);
   }
 };
@@ -59467,29 +59469,34 @@ var homeDir = process.env.HOME;
 var installFvm = async () => {
   const result = await fetch("https://fvm.app/install.sh");
   const buffer = await result.arrayBuffer();
-  return execWithRetry("bash", { input: Buffer.from(buffer) });
+  return execWithRetry("bash", { input: Buffer.from(buffer) }, "Failed to install FVM.");
 };
 var mainRun = async () => {
   try {
-    const workingDirectory = core.getInput("working-directory");
-    const flutterVersion = await getFlutterVersion(workingDirectory);
-    if (!cache.isFeatureAvailable()) {
-      core.setFailed("Cache is not available");
+    const fvmrcPath = core.getInput("fvmrc-path");
+    const projectDir = core.getInput("project-dir");
+    const cacheEnabled = core.getInput("cache") === "true";
+    if (cacheEnabled) {
+      if (!cache.isFeatureAvailable()) {
+        core.setFailed("Caching feature is not available");
+        return;
+      }
+      const flutterVersion = await getFlutterVersion(fvmrcPath);
+      const cacheKeys = await getCacheKeys(projectDir, flutterVersion);
+      await cache.restoreCache([
+        path2.join(homeDir, "fvm/versions", flutterVersion),
+        path2.join(homeDir, "fvm/cache.git")
+      ], cacheKeys.flutterSdkCacheKey, cacheKeys.flutterSdkRestoreCacheKeys).then((cacheHit) => {
+        if (!cacheHit) {
+          core.info("No Flutter SDK cache found");
+        }
+      });
+      await cache.restoreCache([path2.join(homeDir, ".pub-cache")], cacheKeys.pubCacheKey, cacheKeys.pubRestoreCacheKeys).then((cacheHit) => {
+        if (!cacheHit) {
+          core.info("No Pub cache found");
+        }
+      });
     }
-    const cacheKeys = await getCacheKeys(workingDirectory);
-    await cache.restoreCache([
-      path2.join(homeDir, "fvm/versions", flutterVersion),
-      path2.join(homeDir, "fvm/cache.git")
-    ], cacheKeys.flutterSdkCacheKey, cacheKeys.flutterSdkRestoreCacheKeys).then((cacheHit) => {
-      if (!cacheHit) {
-        core.info("No Flutter SDK cache found");
-      }
-    });
-    await cache.restoreCache([path2.join(homeDir, ".pub-cache")], cacheKeys.pubCacheKey, cacheKeys.pubRestoreCacheKeys).then((cacheHit) => {
-      if (!cacheHit) {
-        core.info("No Pub cache found");
-      }
-    });
     await installFvm();
     const fvmUseExitCode = await exec3.exec("fvm use");
     core.saveState("fvm-use-success", fvmUseExitCode === 0);

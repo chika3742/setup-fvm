@@ -59420,18 +59420,19 @@ var cache = __toESM(require_cache3(), 1);
 var glob = __toESM(require_glob2(), 1);
 import path from "path";
 import fs from "fs/promises";
-var getFlutterVersion = async (workingDirectory) => {
-  const fvmrcPath = path.resolve(process.env.GITHUB_WORKSPACE, workingDirectory, ".fvmrc");
+var getFlutterVersion = async (fvmrcPath) => {
+  const workspaceDir = process.env.GITHUB_WORKSPACE;
+  fvmrcPath = path.resolve(workspaceDir, fvmrcPath);
   const fvmrcContent = await fs.readFile(fvmrcPath, "utf-8");
   return JSON.parse(fvmrcContent).flutter;
 };
-var getCacheKeys = async (workingDirectory) => {
+var getCacheKeys = async (flutterProjectDir, flutterVersion) => {
   const runnerOs = process.env.RUNNER_OS;
   const workspaceDir = process.env.GITHUB_WORKSPACE;
   return {
-    flutterSdkCacheKey: `${runnerOs}-flutter-${await getFlutterVersion(workingDirectory)}`,
+    flutterSdkCacheKey: `${runnerOs}-flutter-${flutterVersion}`,
     flutterSdkRestoreCacheKeys: [`${runnerOs}-flutter-`],
-    pubCacheKey: `${runnerOs}-pub-${await glob.hashFiles("**/pubspec.lock", path.resolve(workspaceDir, workingDirectory))}`,
+    pubCacheKey: `${runnerOs}-pub-${await glob.hashFiles("**/pubspec.lock", path.resolve(workspaceDir, flutterProjectDir))}`,
     pubRestoreCacheKeys: [`${runnerOs}-pub-`]
   };
 };
@@ -59440,15 +59441,19 @@ var getCacheKeys = async (workingDirectory) => {
 import path2 from "path";
 var postRun = async () => {
   try {
+    if (core.getInput("cache") !== "true") {
+      return;
+    }
     const fvmUseSuccess = core.getState("fvm-use-success");
     if (fvmUseSuccess !== "true") {
       core.info("Saving cache is skipped because initializing FVM failed.");
       return;
     }
     const homeDir = process.env.HOME;
-    const workingDirectory = core.getInput("working-directory");
-    const cacheKeys = await getCacheKeys(workingDirectory);
-    const flutterVersion = await getFlutterVersion(workingDirectory);
+    const fvmrcPath = core.getInput("fvmrc-path");
+    const projectDir = core.getInput("project-dir");
+    const flutterVersion = await getFlutterVersion(fvmrcPath);
+    const cacheKeys = await getCacheKeys(projectDir, flutterVersion);
     await cache.saveCache([
       path2.join(homeDir, "fvm/versions", flutterVersion),
       path2.join(homeDir, "fvm/cache.git")
