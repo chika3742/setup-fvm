@@ -3,6 +3,9 @@ import * as cache from '@actions/cache';
 import * as exec from '@actions/exec';
 import { type CacheOptions, getCacheOptions, getFlutterVersion } from "./utils/cache-options.ts";
 import { execWithRetry } from "./utils/exec-with-retry.ts";
+import * as path from "path";
+
+const workspaceDir = process.env.GITHUB_WORKSPACE!;
 
 const installFvm = async (): Promise<void> => {
   const result = await fetch("https://fvm.app/install.sh")
@@ -56,7 +59,9 @@ export const mainRun = async () => {
 
     // install Flutter SDK and Pub dependencies
     await core.group("Run fvm use", async () => {
-      const fvmUseExitCode = await exec.exec("fvm use");
+      const fvmUseExitCode = await exec.exec("fvm use", [], {
+        cwd: path.join(workspaceDir, projectDir),
+      });
       core.saveState("fvm-use-success", fvmUseExitCode === 0);
     })
   } catch (e) {
