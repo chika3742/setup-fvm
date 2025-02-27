@@ -7,27 +7,29 @@ const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout
  *
  * @param commandLine Command line to exec.
  * @param options {@link exec.ExecOptions} to pass to {@link exec.exec}.
+ * @param failureMessage A message to show when an attempt to execute the command fails. Defaults to "Failed to execute {commandLine}.".
  * @param retryCount How many times to retry the command.
  * @param retryInterval Interval in seconds between retries.
  */
-export const execWithRetry = async (commandLine: string, options: exec.ExecOptions, retryCount = 3, retryInterval = 10) => {
-  let trial = 1;
+export const execWithRetry = async (commandLine: string, options: exec.ExecOptions, failureMessage?: string, retryCount = 3, retryInterval = 5) => {
+  const attemptFailureMessage = failureMessage ?? `Failed to execute "${commandLine}".`;
+  let attempt = 1;
 
   while (true) {
     const exitCode = await exec.exec(commandLine, [], {
       ...options,
-      failOnStdErr: false,
+      ignoreReturnCode: true,
     });
     if (exitCode === 0) {
       return; // complete function
     }
-    if (trial >= retryCount) {
-      throw new Error(`Failed to execute "${commandLine}" in ${retryCount} trials.`);
+    if (attempt >= retryCount) {
+      throw new Error(`${attemptFailureMessage} in ${retryCount} attempts.`);
     }
 
     // retry
-    trial++;
-    console.error(`Failed to execute "${commandLine}". Retrying...(${trial} of ${retryCount})`);
+    attempt++;
+    console.error(`${attemptFailureMessage} Retrying...(${attempt} of ${retryCount})`);
     await sleep(retryInterval * 1000); // interval
   }
 }

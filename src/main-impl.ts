@@ -10,7 +10,7 @@ const homeDir = process.env.HOME!;
 const installFvm = async (): Promise<void> => {
   const result = await fetch("https://fvm.app/install.sh")
   const buffer = await result.arrayBuffer()
-  return execWithRetry("bash", { input: Buffer.from(buffer) });
+  return execWithRetry("bash", { input: Buffer.from(buffer) }, "Failed to install FVM.");
 }
 
 export const mainRun = async () => {
