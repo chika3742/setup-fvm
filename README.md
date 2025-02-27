@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Initialize Flutter SDK
-        uses: chika3742/setup-fvm@v2
+        uses: chika3742/setup-fvm@v3
         with:
           fvmrc-path: .fvmrc
           project-dir: .
@@ -24,10 +24,6 @@ jobs:
 ```
 
 ## Inputs
-
-### `fvmrc-path`
-
-**Optional** Path to `.fvmrc` file. Defaults to `.fvmrc`.
 
 ### `project-dir`
 
