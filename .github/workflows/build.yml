@@ -43,7 +43,7 @@ jobs:
             git commit -m "chore: update build outputs [skip ci]"
             git tag ${{ github.ref_name }} --force
             git tag $(echo "${{ github.ref_name }}" | cut -d '.' -f 1) --force 
-            git push --tags
+            git push --force-with-lease --tags
           else
             echo "No changes to commit."
           fi
