@@ -1,16 +1,27 @@
 import * as core from '@actions/core';
 import * as cache from '@actions/cache';
 import * as exec from '@actions/exec';
-import { getCacheKeys, getFlutterVersion } from "./utils/cache-keys.ts";
-import path from "path";
+import { type CacheOptions, getCacheOptions, getFlutterVersion } from "./utils/cache-options.ts";
 import { execWithRetry } from "./utils/exec-with-retry.ts";
-
-const homeDir = process.env.HOME!;
 
 const installFvm = async (): Promise<void> => {
   const result = await fetch("https://fvm.app/install.sh")
   const buffer = await result.arrayBuffer()
   return execWithRetry("bash", { input: Buffer.from(buffer) }, "Failed to install FVM.");
+}
+
+const restoreCache = async (options: CacheOptions, stateKey: string) => {
+  const cacheHit = await cache.restoreCache(
+    options.paths,
+    options.cacheKey,
+    options.restoreKeys,
+  );
+  if (!cacheHit) {
+    core.info("No Flutter SDK cache found");
+    return;
+  }
+  core.saveState(`${stateKey}-cache-hit`, cacheHit);
+  core.setOutput(`${stateKey}-cache-hit`, cacheHit);
 }
 
 export const mainRun = async () => {
@@ -20,46 +31,35 @@ export const mainRun = async () => {
     const projectDir = core.getInput("project-dir");
     const cacheEnabled = core.getInput("cache") === "true";
 
+    // restore caches
     if (cacheEnabled) {
       if (!cache.isFeatureAvailable()) {
         core.setFailed('Caching feature is not available');
         return;
       }
 
+      // log group
       const flutterVersion = await getFlutterVersion(fvmrcPath);
-      const cacheKeys = await getCacheKeys(projectDir, flutterVersion);
+      const cacheOptions = await getCacheOptions(projectDir, flutterVersion);
 
       // restore Flutter SDK cache
-      await cache.restoreCache(
-        [
-          path.join(homeDir, "fvm/versions", flutterVersion),
-          path.join(homeDir, "fvm/cache.git"),
-        ],
-        cacheKeys.flutterSdkCacheKey,
-        cacheKeys.flutterSdkRestoreCacheKeys,
-      ).then((cacheHit) => {
-        if (!cacheHit) {
-          core.info("No Flutter SDK cache found");
-        }
-      });
+      await core.group("Restore Flutter SDK cache", () => {
+        return restoreCache(cacheOptions.flutterSdk, "flutter");
+      })
 
       // restore pub cache
-      await cache.restoreCache(
-        [path.join(homeDir, ".pub-cache")],
-        cacheKeys.pubCacheKey,
-        cacheKeys.pubRestoreCacheKeys,
-      ).then((cacheHit) => {
-        if (!cacheHit) {
-          core.info("No Pub cache found");
-        }
-      });
+      await core.group("Restore Pub cache", () => {
+        return restoreCache(cacheOptions.pub, "pub");
+      })
     }
 
-    await installFvm();
+    await core.group("Install FVM", installFvm);
 
     // install Flutter SDK and Pub dependencies
-    const fvmUseExitCode = await exec.exec("fvm use");
-    core.saveState("fvm-use-success", fvmUseExitCode === 0);
+    await core.group("Run fvm use", async () => {
+      const fvmUseExitCode = await exec.exec("fvm use");
+      core.saveState("fvm-use-success", fvmUseExitCode === 0);
+    })
   } catch (e) {
     core.setFailed((e as any).message);
   }

@@ -19,6 +19,12 @@ inputs:
     required: false
     default: "true"
 
+outputs:
+  flutter-cache-hit:
+    description: The key for the cache hit of Flutter SDK cache.
+  pub-cache-hit:
+    description: The key for the cache hit if Pub packages cache.
+
 runs:
   using: node20
   main: dist/main.js
