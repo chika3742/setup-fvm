@@ -15,14 +15,15 @@ const installFvm = async (): Promise<void> => {
 
 export const mainRun = async () => {
   try {
-    const workingDirectory = core.getInput('working-directory');
+    const fvmrcPath = core.getInput("fvmrc-path");
+    const projectDir = core.getInput("project-dir");
 
-    const flutterVersion = await getFlutterVersion(workingDirectory);
+    const flutterVersion = await getFlutterVersion(fvmrcPath);
 
     if (!cache.isFeatureAvailable()) {
-      core.setFailed('Cache is not available');
+      core.setFailed('Caching feature is not available');
     }
-    const cacheKeys = await getCacheKeys(workingDirectory);
+    const cacheKeys = await getCacheKeys(projectDir, flutterVersion);
 
     // restore Flutter SDK cache
     await cache.restoreCache(

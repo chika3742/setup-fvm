@@ -6,8 +6,12 @@ branding:
   icon: arrow-down-circle
 
 inputs:
-  working-directory:
-    description: The root directory of the Flutter project.
+  fvmrc-path:
+    description: Path to .fvmrc file.
+    required: false
+    default: ".fvmrc"
+  project-dir:
+    description: Directory path to the Flutter project.
     required: false
     default: "."
 

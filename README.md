@@ -15,11 +15,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: chika3742/setup-fvm@main
+      - name: Initialize Flutter SDK
+        uses: chika3742/setup-fvm@main
+        with:
+          fvmrc-path: .fvmrc
+          project-dir: .
 ```
 
 ## Inputs
 
-### `working-directory`
+### `fvmrc-path`
 
-**Optional** The working directory where the Flutter project is located. Default is `.`.
+**Optional** Path to `.fvmrc` file. Defaults to `.fvmrc`.
+
+### `project-dir`
+
+**Optional** Path to the Flutter project root directory. Defaults to `.`.
