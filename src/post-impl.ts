@@ -5,6 +5,10 @@ import path from "path";
 
 export const postRun = async () => {
   try {
+    if (core.getInput("cache") !== "true") {
+      return;
+    }
+
     const fvmUseSuccess = core.getState("fvm-use-success");
     if (fvmUseSuccess !== "true") {
       core.info("Saving cache is skipped because initializing FVM failed.");

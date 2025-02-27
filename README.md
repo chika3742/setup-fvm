@@ -16,10 +16,11 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Initialize Flutter SDK
-        uses: chika3742/setup-fvm@main
+        uses: chika3742/setup-fvm@v2
         with:
           fvmrc-path: .fvmrc
           project-dir: .
+          cache: true
 ```
 
 ## Inputs
@@ -31,3 +32,7 @@ jobs:
 ### `project-dir`
 
 **Optional** Path to the Flutter project root directory. Defaults to `.`.
+
+### `cache`
+
+**Optional** Cache Flutter SDK and Pub packages. Defaults to `true`.

@@ -15,40 +15,45 @@ const installFvm = async (): Promise<void> => {
 
 export const mainRun = async () => {
   try {
+    // inputs
     const fvmrcPath = core.getInput("fvmrc-path");
     const projectDir = core.getInput("project-dir");
+    const cacheEnabled = core.getInput("cache") === "true";
 
-    const flutterVersion = await getFlutterVersion(fvmrcPath);
+    if (cacheEnabled) {
+      if (!cache.isFeatureAvailable()) {
+        core.setFailed('Caching feature is not available');
+        return;
+      }
 
-    if (!cache.isFeatureAvailable()) {
-      core.setFailed('Caching feature is not available');
+      const flutterVersion = await getFlutterVersion(fvmrcPath);
+      const cacheKeys = await getCacheKeys(projectDir, flutterVersion);
+
+      // restore Flutter SDK cache
+      await cache.restoreCache(
+        [
+          path.join(homeDir, "fvm/versions", flutterVersion),
+          path.join(homeDir, "fvm/cache.git"),
+        ],
+        cacheKeys.flutterSdkCacheKey,
+        cacheKeys.flutterSdkRestoreCacheKeys,
+      ).then((cacheHit) => {
+        if (!cacheHit) {
+          core.info("No Flutter SDK cache found");
+        }
+      });
+
+      // restore pub cache
+      await cache.restoreCache(
+        [path.join(homeDir, ".pub-cache")],
+        cacheKeys.pubCacheKey,
+        cacheKeys.pubRestoreCacheKeys,
+      ).then((cacheHit) => {
+        if (!cacheHit) {
+          core.info("No Pub cache found");
+        }
+      });
     }
-    const cacheKeys = await getCacheKeys(projectDir, flutterVersion);
-
-    // restore Flutter SDK cache
-    await cache.restoreCache(
-      [
-        path.join(homeDir, "fvm/versions", flutterVersion),
-        path.join(homeDir, "fvm/cache.git"),
-      ],
-      cacheKeys.flutterSdkCacheKey,
-      cacheKeys.flutterSdkRestoreCacheKeys,
-    ).then((cacheHit) => {
-      if (!cacheHit) {
-        core.info("No Flutter SDK cache found");
-      }
-    });
-
-    // restore pub cache
-    await cache.restoreCache(
-      [path.join(homeDir, ".pub-cache")],
-      cacheKeys.pubCacheKey,
-      cacheKeys.pubRestoreCacheKeys,
-    ).then((cacheHit) => {
-      if (!cacheHit) {
-        core.info("No Pub cache found");
-      }
-    });
 
     await installFvm();
 
