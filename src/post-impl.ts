@@ -27,10 +27,9 @@ export const postRun = async () => {
     }
 
     // inputs
-    const fvmrcPath = core.getInput('fvmrc-path');
     const projectDir = core.getInput('project-dir');
 
-    const flutterVersion = await getFlutterVersion(fvmrcPath);
+    const flutterVersion = await getFlutterVersion(projectDir);
     const cacheOptions = await getCacheOptions(projectDir, flutterVersion);
 
     // save Flutter SDK cache

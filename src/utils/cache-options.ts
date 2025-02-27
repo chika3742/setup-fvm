@@ -9,11 +9,13 @@ const workspaceDir = process.env.GITHUB_WORKSPACE!;
 /**
  * Get the version of Flutter from `.fvmrc` file.
  *
- * @param fvmrcPath Path of `.fvmrc` file relative to repository root.
+ * @param projectDir Relative path to the project root.
  */
-export const getFlutterVersion = async (fvmrcPath: string): Promise<string> => {
-  const workspaceDir = process.env.GITHUB_WORKSPACE!;
-  fvmrcPath = path.resolve(workspaceDir, fvmrcPath);
+export const getFlutterVersion = async (projectDir: string): Promise<string> => {
+  const fvmrcPath = path.join(workspaceDir, projectDir, ".fvmrc");
+  if (!await fs.exists(fvmrcPath)) {
+    throw new Error(".fvmrc was not found. Make sure project-dir is set properly.");
+  }
   const fvmrcContent = await fs.readFile(fvmrcPath, 'utf-8');
   return JSON.parse(fvmrcContent).flutter;
 }
@@ -32,11 +34,11 @@ interface Caches {
 /**
  * Get cache keys for Flutter SDK and Pub cache.
  *
- * @param flutterProjectDir The root directory path of Flutter project relative to repository root.
+ * @param projectDir The root directory path of Flutter project relative to repository root.
  * @param flutterVersion The version of Flutter (e.g. `3.29.0`)
  */
-export const getCacheOptions = async (flutterProjectDir: string, flutterVersion: string): Promise<Caches> => {
-  const pubspecHash = await glob.hashFiles("**/pubspec.lock", path.resolve(workspaceDir, flutterProjectDir));
+export const getCacheOptions = async (projectDir: string, flutterVersion: string): Promise<Caches> => {
+  const pubspecHash = await glob.hashFiles("**/pubspec.lock", path.join(workspaceDir, projectDir));
   return {
     flutterSdk: {
       paths: [

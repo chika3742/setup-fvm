@@ -27,7 +27,6 @@ const restoreCache = async (options: CacheOptions, stateKey: string) => {
 export const mainRun = async () => {
   try {
     // inputs
-    const fvmrcPath = core.getInput("fvmrc-path");
     const projectDir = core.getInput("project-dir");
     const cacheEnabled = core.getInput("cache") === "true";
 
@@ -39,7 +38,7 @@ export const mainRun = async () => {
       }
 
       // log group
-      const flutterVersion = await getFlutterVersion(fvmrcPath);
+      const flutterVersion = await getFlutterVersion(projectDir);
       const cacheOptions = await getCacheOptions(projectDir, flutterVersion);
 
       // restore Flutter SDK cache
