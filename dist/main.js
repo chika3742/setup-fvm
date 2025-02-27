@@ -59417,29 +59417,37 @@ var core = __toESM(require_core(), 1);
 var cache = __toESM(require_cache3(), 1);
 var exec3 = __toESM(require_exec(), 1);
 
-// src/utils/cache-keys.ts
+// src/utils/cache-options.ts
 var glob = __toESM(require_glob2(), 1);
 import path from "path";
 import fs from "fs/promises";
+var homeDir = process.env.HOME;
+var runnerOs = process.env.RUNNER_OS;
+var workspaceDir = process.env.GITHUB_WORKSPACE;
 var getFlutterVersion = async (fvmrcPath) => {
-  const workspaceDir = process.env.GITHUB_WORKSPACE;
-  fvmrcPath = path.resolve(workspaceDir, fvmrcPath);
+  const workspaceDir2 = process.env.GITHUB_WORKSPACE;
+  fvmrcPath = path.resolve(workspaceDir2, fvmrcPath);
   const fvmrcContent = await fs.readFile(fvmrcPath, "utf-8");
   return JSON.parse(fvmrcContent).flutter;
 };
-var getCacheKeys = async (flutterProjectDir, flutterVersion) => {
-  const runnerOs = process.env.RUNNER_OS;
-  const workspaceDir = process.env.GITHUB_WORKSPACE;
+var getCacheOptions = async (flutterProjectDir, flutterVersion) => {
+  const pubspecHash = await glob.hashFiles("**/pubspec.lock", path.resolve(workspaceDir, flutterProjectDir));
   return {
-    flutterSdkCacheKey: `${runnerOs}-flutter-${flutterVersion}`,
-    flutterSdkRestoreCacheKeys: [`${runnerOs}-flutter-`],
-    pubCacheKey: `${runnerOs}-pub-${await glob.hashFiles("**/pubspec.lock", path.resolve(workspaceDir, flutterProjectDir))}`,
-    pubRestoreCacheKeys: [`${runnerOs}-pub-`]
+    flutterSdk: {
+      paths: [
+        path.join(homeDir, "fvm/versions", flutterVersion),
+        path.join(homeDir, "fvm/cache.git")
+      ],
+      cacheKey: `${runnerOs}-flutter-${flutterVersion}`,
+      restoreKeys: [`${runnerOs}-flutter-`]
+    },
+    pub: {
+      paths: [path.join(homeDir, ".pub-cache")],
+      cacheKey: `${runnerOs}-pub-${pubspecHash}`,
+      restoreKeys: [`${runnerOs}-pub-`]
+    }
   };
 };
-
-// src/main-impl.ts
-import path2 from "path";
 
 // src/utils/exec-with-retry.ts
 var exec = __toESM(require_exec(), 1);
@@ -59465,11 +59473,19 @@ var execWithRetry = async (commandLine, options, failureMessage, retryCount = 3,
 };
 
 // src/main-impl.ts
-var homeDir = process.env.HOME;
 var installFvm = async () => {
   const result = await fetch("https://fvm.app/install.sh");
   const buffer = await result.arrayBuffer();
   return execWithRetry("bash", { input: Buffer.from(buffer) }, "Failed to install FVM.");
+};
+var restoreCache2 = async (options, stateKey) => {
+  const cacheHit = await cache.restoreCache(options.paths, options.cacheKey, options.restoreKeys);
+  if (!cacheHit) {
+    core.info("No Flutter SDK cache found");
+    return;
+  }
+  core.saveState(`${stateKey}-cache-hit`, cacheHit);
+  core.setOutput(`${stateKey}-cache-hit`, cacheHit);
 };
 var mainRun = async () => {
   try {
@@ -59482,24 +59498,19 @@ var mainRun = async () => {
         return;
       }
       const flutterVersion = await getFlutterVersion(fvmrcPath);
-      const cacheKeys = await getCacheKeys(projectDir, flutterVersion);
-      await cache.restoreCache([
-        path2.join(homeDir, "fvm/versions", flutterVersion),
-        path2.join(homeDir, "fvm/cache.git")
-      ], cacheKeys.flutterSdkCacheKey, cacheKeys.flutterSdkRestoreCacheKeys).then((cacheHit) => {
-        if (!cacheHit) {
-          core.info("No Flutter SDK cache found");
-        }
+      const cacheOptions = await getCacheOptions(projectDir, flutterVersion);
+      await core.group("Restore Flutter SDK cache", () => {
+        return restoreCache2(cacheOptions.flutterSdk, "flutter");
       });
-      await cache.restoreCache([path2.join(homeDir, ".pub-cache")], cacheKeys.pubCacheKey, cacheKeys.pubRestoreCacheKeys).then((cacheHit) => {
-        if (!cacheHit) {
-          core.info("No Pub cache found");
-        }
+      await core.group("Restore Pub cache", () => {
+        return restoreCache2(cacheOptions.pub, "pub");
       });
     }
-    await installFvm();
-    const fvmUseExitCode = await exec3.exec("fvm use");
-    core.saveState("fvm-use-success", fvmUseExitCode === 0);
+    await core.group("Install FVM", installFvm);
+    await core.group("Run fvm use", async () => {
+      const fvmUseExitCode = await exec3.exec("fvm use");
+      core.saveState("fvm-use-success", fvmUseExitCode === 0);
+    });
   } catch (e) {
     core.setFailed(e.message);
   }
