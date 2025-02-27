@@ -2,8 +2,8 @@ name: Build and Commit
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - v*
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -41,7 +41,9 @@ jobs:
           # 変更がある場合のみコミットしてpush
           if ! git diff-index --quiet HEAD; then
             git commit -m "chore: update build outputs [skip ci]"
-            git push
+            git tag ${{ github.ref_name }}
+            git tag --force $(echo "${{ github.ref_name }}" | cut -d '.' -f 1)
+            git push --tags
           else
             echo "No changes to commit."
           fi
