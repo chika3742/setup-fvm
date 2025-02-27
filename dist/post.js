@@ -59416,29 +59416,50 @@ var require_glob2 = __commonJS((exports) => {
 var core = __toESM(require_core(), 1);
 var cache = __toESM(require_cache3(), 1);
 
-// src/utils/cache-keys.ts
+// src/utils/cache-options.ts
 var glob = __toESM(require_glob2(), 1);
 import path from "path";
 import fs from "fs/promises";
-var getFlutterVersion = async (fvmrcPath) => {
-  const workspaceDir = process.env.GITHUB_WORKSPACE;
-  fvmrcPath = path.resolve(workspaceDir, fvmrcPath);
+var homeDir = process.env.HOME;
+var runnerOs = process.env.RUNNER_OS;
+var workspaceDir = process.env.GITHUB_WORKSPACE;
+var getFlutterVersion = async (projectDir) => {
+  const fvmrcPath = path.join(workspaceDir, projectDir, ".fvmrc");
+  if (!await fs.exists(fvmrcPath)) {
+    throw new Error(".fvmrc was not found. Make sure project-dir is set properly.");
+  }
   const fvmrcContent = await fs.readFile(fvmrcPath, "utf-8");
   return JSON.parse(fvmrcContent).flutter;
 };
-var getCacheKeys = async (flutterProjectDir, flutterVersion) => {
-  const runnerOs = process.env.RUNNER_OS;
-  const workspaceDir = process.env.GITHUB_WORKSPACE;
+var getCacheOptions = async (projectDir, flutterVersion) => {
+  const pubspecHash = await glob.hashFiles("**/pubspec.lock", path.join(workspaceDir, projectDir));
   return {
-    flutterSdkCacheKey: `${runnerOs}-flutter-${flutterVersion}`,
-    flutterSdkRestoreCacheKeys: [`${runnerOs}-flutter-`],
-    pubCacheKey: `${runnerOs}-pub-${await glob.hashFiles("**/pubspec.lock", path.resolve(workspaceDir, flutterProjectDir))}`,
-    pubRestoreCacheKeys: [`${runnerOs}-pub-`]
+    flutterSdk: {
+      paths: [
+        path.join(homeDir, "fvm/versions", flutterVersion),
+        path.join(homeDir, "fvm/cache.git")
+      ],
+      cacheKey: `${runnerOs}-flutter-${flutterVersion}`,
+      restoreKeys: [`${runnerOs}-flutter-`]
+    },
+    pub: {
+      paths: [path.join(homeDir, ".pub-cache")],
+      cacheKey: `${runnerOs}-pub-${pubspecHash}`,
+      restoreKeys: [`${runnerOs}-pub-`]
+    }
   };
 };
 
 // src/post-impl.ts
-import path2 from "path";
+var saveCache2 = async (options, stateKey) => {
+  const cacheHit = core.getState(`${stateKey}-cache-hit`);
+  if (options.cacheKey === cacheHit) {
+    core.info("Skip saving cache as the cache key has not changed.");
+    return;
+  }
+  await cache.saveCache(options.paths, options.cacheKey);
+  core.info(`${stateKey} cache saved: ${options.cacheKey}`);
+};
 var postRun = async () => {
   try {
     if (core.getInput("cache") !== "true") {
@@ -59449,19 +59470,14 @@ var postRun = async () => {
       core.info("Saving cache is skipped because initializing FVM failed.");
       return;
     }
-    const homeDir = process.env.HOME;
-    const fvmrcPath = core.getInput("fvmrc-path");
     const projectDir = core.getInput("project-dir");
-    const flutterVersion = await getFlutterVersion(fvmrcPath);
-    const cacheKeys = await getCacheKeys(projectDir, flutterVersion);
-    await cache.saveCache([
-      path2.join(homeDir, "fvm/versions", flutterVersion),
-      path2.join(homeDir, "fvm/cache.git")
-    ], cacheKeys.flutterSdkCacheKey).then(() => {
-      core.info(`Flutter SDK cache saved: ${cacheKeys.flutterSdkCacheKey}`);
+    const flutterVersion = await getFlutterVersion(projectDir);
+    const cacheOptions = await getCacheOptions(projectDir, flutterVersion);
+    await core.group("Save Flutter SDK cache", () => {
+      return saveCache2(cacheOptions.flutterSdk, "flutter");
     });
-    await cache.saveCache([path2.join(homeDir, ".pub-cache")], cacheKeys.pubCacheKey).then(() => {
-      core.info(`Pub cache saved: ${cacheKeys.pubCacheKey}`);
+    await core.group("Save Pub cache", () => {
+      return saveCache2(cacheOptions.pub, "pub");
     });
   } catch (e) {
     core.setFailed(e.message);
