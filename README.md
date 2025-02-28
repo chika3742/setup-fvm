@@ -18,9 +18,8 @@ jobs:
       - name: Initialize Flutter SDK
         uses: chika3742/setup-fvm@v3
         with:
-          fvmrc-path: .fvmrc
-          project-dir: .
-          cache: true
+          project-dir: . # default
+          cache: true # default
 ```
 
 ## Inputs
