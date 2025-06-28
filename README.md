@@ -1,9 +1,12 @@
 # setup-fvm
 
-This action does:
-- Install FVM
-- Install Flutter SDK and dependencies in pubspec (running `fvm use`)
-- Cache Flutter SDK and Pub packages
+This action performs the following tasks:
+
+- Installs FVM
+- Installs the Flutter SDK and pubspec dependencies (by running fvm use)
+- Caches the Flutter SDK and Pub packages
+
+Even if the job using this action fails, the cache will always be saved as long as this action itself succeeds.
 
 ## Usage
 
