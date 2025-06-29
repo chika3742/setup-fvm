@@ -498,8 +498,7 @@ var require_tunnel = __commonJS((exports) => {
       console.error.apply(console, args);
     };
   } else {
-    debug = function() {
-    };
+    debug = function() {};
   }
   exports.debug = debug;
 });
@@ -927,8 +926,7 @@ var require_util = __commonJS((exports, module) => {
   var { stringify } = __require("querystring");
   var { headerNameLowerCasedRecord } = require_constants();
   var [nodeMajor, nodeMinor] = process.versions.node.split(".").map((v) => Number(v));
-  function nop() {
-  }
+  function nop() {}
   function isStream(obj) {
     return obj && typeof obj === "object" && typeof obj.pipe === "function" && typeof obj.on === "function";
   }
@@ -1505,8 +1503,7 @@ var require_PartStream = __commonJS((exports, module) => {
     ReadableStream2.call(this, opts);
   }
   inherits(PartStream, ReadableStream2);
-  PartStream.prototype._read = function(n) {
-  };
+  PartStream.prototype._read = function(n) {};
   module.exports = PartStream;
 });
 
@@ -1633,8 +1630,7 @@ var require_Dicer = __commonJS((exports, module) => {
   var B_ONEDASH = Buffer.from("-");
   var B_CRLF = Buffer.from(`\r
 `);
-  var EMPTY_FN = function() {
-  };
+  var EMPTY_FN = function() {};
   function Dicer(cfg) {
     if (!(this instanceof Dicer)) {
       return new Dicer(cfg);
@@ -1951,8 +1947,7 @@ var require_decodeText = __commonJS((exports, module) => {
       if (textDecoders.has(exports.toString())) {
         try {
           return textDecoders.get(exports).decode(data);
-        } catch {
-        }
+        } catch {}
       }
       return typeof data === "string" ? data : data.toString();
     }
@@ -2845,8 +2840,7 @@ var require_multipart = __commonJS((exports, module) => {
     this.truncated = false;
   }
   inherits(FileStream, Readable);
-  FileStream.prototype._read = function(n) {
-  };
+  FileStream.prototype._read = function(n) {};
   module.exports = Multipart;
 });
 
@@ -3527,8 +3521,7 @@ var require_util2 = __commonJS((exports, module) => {
     crypto = __require("crypto");
     const possibleRelevantHashes = ["sha256", "sha384", "sha512"];
     supportedHashes = crypto.getHashes().filter((hash) => possibleRelevantHashes.includes(hash));
-  } catch {
-  }
+  } catch {}
   function responseURL(response) {
     const urlList = response.urlList;
     const length = urlList.length;
@@ -3885,8 +3878,7 @@ var require_util2 = __commonJS((exports, module) => {
     }
     return true;
   }
-  function tryUpgradeRequestToAPotentiallyTrustworthyURL(request) {
-  }
+  function tryUpgradeRequestToAPotentiallyTrustworthyURL(request) {}
   function sameOrigin(A, B) {
     if (A.origin === B.origin && A.origin === "null") {
       return true;
@@ -5096,8 +5088,7 @@ var require_body = __commonJS((exports, module) => {
           controller.enqueue(typeof source === "string" ? textEncoder.encode(source) : source);
           queueMicrotask(() => readableStreamClose(controller));
         },
-        start() {
-        },
+        start() {},
         type: undefined
       });
     }
@@ -6099,8 +6090,7 @@ var require_connect = __commonJS((exports, module) => {
   }
   function setupTimeout(onConnectTimeout2, timeout) {
     if (!timeout) {
-      return () => {
-      };
+      return () => {};
     }
     let s1 = null;
     let s2 = null;
@@ -6542,8 +6532,7 @@ var require_RedirectHandler = __commonJS((exports, module) => {
       }
     }
     onData(chunk) {
-      if (this.location) {
-      } else {
+      if (this.location) {} else {
         return this.handler.onData(chunk);
       }
     }
@@ -6916,8 +6905,7 @@ var require_client = __commonJS((exports, module) => {
       const origin = opts.origin || this[kUrl].origin;
       const request = this[kHTTPConnVersion] === "h2" ? Request[kHTTP2BuildRequest](origin, opts, handler) : Request[kHTTP1BuildRequest](origin, opts, handler);
       this[kQueue].push(request);
-      if (this[kResuming]) {
-      } else if (util.bodyLength(request.body) == null && util.isIterable(request.body)) {
+      if (this[kResuming]) {} else if (util.bodyLength(request.body) == null && util.isIterable(request.body)) {
         this[kResuming] = 1;
         process.nextTick(resume, this);
       } else {
@@ -7536,8 +7524,7 @@ var require_client = __commonJS((exports, module) => {
         });
       });
       if (client.destroyed) {
-        util.destroy(socket.on("error", () => {
-        }), new ClientDestroyedError);
+        util.destroy(socket.on("error", () => {}), new ClientDestroyedError);
         return;
       }
       client[kConnecting] = false;
@@ -8945,8 +8932,7 @@ var require_readable = __commonJS((exports, module) => {
   var kBody = Symbol("kBody");
   var kAbort = Symbol("abort");
   var kContentType = Symbol("kContentType");
-  var noop = () => {
-  };
+  var noop = () => {};
   module.exports = class BodyReadable extends Readable {
     constructor({
       resume,
@@ -9122,8 +9108,7 @@ var require_readable = __commonJS((exports, module) => {
       });
     }
     consume2.stream.resume();
-    while (consume2.stream.read() != null) {
-    }
+    while (consume2.stream.read() != null) {}
   }
   function consumeEnd(consume2) {
     const { type, body, resolve, stream, length } = consume2;
@@ -9207,8 +9192,7 @@ var require_util3 = __commonJS((exports, module) => {
         process.nextTick(callback, new ResponseStatusCodeError(`Response status code ${statusCode}${statusMessage ? `: ${statusMessage}` : ""}`, statusCode, headers, payload));
         return;
       }
-    } catch (err) {
-    }
+    } catch (err) {}
     process.nextTick(callback, new ResponseStatusCodeError(`Response status code ${statusCode}${statusMessage ? `: ${statusMessage}` : ""}`, statusCode, headers));
   }
   module.exports = { getResolveErrorBodyCallback };
@@ -10210,8 +10194,7 @@ var require_mock_utils = __commonJS((exports, module) => {
       handler.onComplete(responseTrailers);
       deleteMockDispatch(mockDispatches, key);
     }
-    function resume() {
-    }
+    function resume() {}
     return true;
   }
   function buildMockDispatch() {
@@ -10791,8 +10774,7 @@ var require_proxy_agent = __commonJS((exports, module) => {
               }
             });
             if (statusCode !== 200) {
-              socket.on("error", () => {
-              }).destroy();
+              socket.on("error", () => {}).destroy();
               callback(new RequestAbortedError(`Proxy response (${statusCode}) !== 200 when HTTP Tunneling`));
             }
             if (opts2.protocol !== "https:") {
@@ -11209,8 +11191,7 @@ var require_headers = __commonJS((exports, module) => {
     }
     if (headers[kGuard] === "immutable") {
       throw new TypeError("immutable");
-    } else if (headers[kGuard] === "request-no-cors") {
-    }
+    } else if (headers[kGuard] === "request-no-cors") {}
     return headers[kHeadersList].append(name, value);
   }
 
@@ -11321,8 +11302,7 @@ var require_headers = __commonJS((exports, module) => {
       }
       if (this[kGuard] === "immutable") {
         throw new TypeError("immutable");
-      } else if (this[kGuard] === "request-no-cors") {
-      }
+      } else if (this[kGuard] === "request-no-cors") {}
       if (!this[kHeadersList].contains(name)) {
         return;
       }
@@ -11375,8 +11355,7 @@ var require_headers = __commonJS((exports, module) => {
       }
       if (this[kGuard] === "immutable") {
         throw new TypeError("immutable");
-      } else if (this[kGuard] === "request-no-cors") {
-      }
+      } else if (this[kGuard] === "request-no-cors") {}
       this[kHeadersList].set(name, value);
     }
     getSetCookie() {
@@ -12051,8 +12030,7 @@ var require_request2 = __commonJS((exports, module) => {
             } else if (getEventListeners(signal, "abort").length >= defaultMaxListeners) {
               setMaxListeners(100, signal);
             }
-          } catch {
-          }
+          } catch {}
           util.addAbortListener(signal, abort);
           requestFinalizer.register(ac, { signal, abort });
         }
@@ -12641,10 +12619,8 @@ var require_fetch = __commonJS((exports, module) => {
     if (!request.headersList.contains("accept-language")) {
       request.headersList.append("accept-language", "*");
     }
-    if (request.priority === null) {
-    }
-    if (subresourceSet.has(request.destination)) {
-    }
+    if (request.priority === null) {}
+    if (subresourceSet.has(request.destination)) {}
     mainFetch(fetchParams).catch((err) => {
       fetchParams.controller.terminate(err);
     });
@@ -12694,8 +12670,7 @@ var require_fetch = __commonJS((exports, module) => {
       return response;
     }
     if (response.status !== 0 && !response.internalResponse) {
-      if (request.responseTainting === "cors") {
-      }
+      if (request.responseTainting === "cors") {}
       if (request.responseTainting === "basic") {
         response = filterResponse(response, "basic");
       } else if (request.responseTainting === "cors") {
@@ -12831,8 +12806,7 @@ var require_fetch = __commonJS((exports, module) => {
         controller.enqueue(chunk);
       };
       const transformStream = new TransformStream({
-        start() {
-        },
+        start() {},
         transform: identityTransformAlgorithm,
         flush: processResponseEndOfBody
       }, {
@@ -12862,8 +12836,7 @@ var require_fetch = __commonJS((exports, module) => {
     let response = null;
     let actualResponse = null;
     const timingInfo = fetchParams.timingInfo;
-    if (request.serviceWorkers === "all") {
-    }
+    if (request.serviceWorkers === "all") {}
     if (response === null) {
       if (request.redirect === "follow") {
         request.serviceWorkers = "none";
@@ -12977,8 +12950,7 @@ var require_fetch = __commonJS((exports, module) => {
     if (contentLengthHeaderValue != null) {
       httpRequest.headersList.append("content-length", contentLengthHeaderValue);
     }
-    if (contentLength != null && httpRequest.keepalive) {
-    }
+    if (contentLength != null && httpRequest.keepalive) {}
     if (httpRequest.referrer instanceof URL) {
       httpRequest.headersList.append("referer", isomorphicEncode(httpRequest.referrer.href));
     }
@@ -13012,22 +12984,18 @@ var require_fetch = __commonJS((exports, module) => {
       }
     }
     httpRequest.headersList.delete("host");
-    if (includeCredentials) {
-    }
+    if (includeCredentials) {}
     if (httpCache == null) {
       httpRequest.cache = "no-store";
     }
-    if (httpRequest.mode !== "no-store" && httpRequest.mode !== "reload") {
-    }
+    if (httpRequest.mode !== "no-store" && httpRequest.mode !== "reload") {}
     if (response == null) {
       if (httpRequest.mode === "only-if-cached") {
         return makeNetworkError("only if cached");
       }
       const forwardResponse = await httpNetworkFetch(httpFetchParams, includeCredentials, isNewConnectionFetch);
-      if (!safeMethodsSet.has(httpRequest.method) && forwardResponse.status >= 200 && forwardResponse.status <= 399) {
-      }
-      if (revalidatingFlag && forwardResponse.status === 304) {
-      }
+      if (!safeMethodsSet.has(httpRequest.method) && forwardResponse.status >= 200 && forwardResponse.status <= 399) {}
+      if (revalidatingFlag && forwardResponse.status === 304) {}
       if (response == null) {
         response = forwardResponse;
       }
@@ -13053,8 +13021,7 @@ var require_fetch = __commonJS((exports, module) => {
       fetchParams.controller.connection.destroy();
       response = await httpNetworkOrCacheFetch(fetchParams, isAuthenticationFetch, true);
     }
-    if (isAuthenticationFetch) {
-    }
+    if (isAuthenticationFetch) {}
     return response;
   }
   async function httpNetworkFetch(fetchParams, includeCredentials = false, forceNewConnection = false) {
@@ -13077,9 +13044,7 @@ var require_fetch = __commonJS((exports, module) => {
       request.cache = "no-store";
     }
     const newConnection = forceNewConnection ? "yes" : "no";
-    if (request.mode === "websocket") {
-    } else {
-    }
+    if (request.mode === "websocket") {} else {}
     let requestBody = null;
     if (request.body == null && fetchParams.processRequestEndOfBody) {
       queueMicrotask(() => fetchParams.processRequestEndOfBody());
@@ -13294,9 +13259,7 @@ var require_fetch = __commonJS((exports, module) => {
             status,
             statusText,
             headersList: headers[kHeadersList],
-            body: decoders.length ? pipeline(this.body, ...decoders, () => {
-            }) : this.body.on("error", () => {
-            })
+            body: decoders.length ? pipeline(this.body, ...decoders, () => {}) : this.body.on("error", () => {})
           });
           return true;
         },
@@ -15551,8 +15514,7 @@ var require_connection = __commonJS((exports, module) => {
   var crypto;
   try {
     crypto = __require("crypto");
-  } catch {
-  }
+  } catch {}
   function establishWebSocketConnection(url, protocols, ws, onEstablish, options) {
     const requestURL = url;
     requestURL.protocol = url.protocol === "ws:" ? "http:" : "https:";
@@ -15678,8 +15640,7 @@ var require_frame = __commonJS((exports, module) => {
   var crypto;
   try {
     crypto = __require("crypto");
-  } catch {
-  }
+  } catch {}
 
   class WebsocketFrameSend {
     constructor(data) {
@@ -16041,8 +16002,7 @@ var require_websocket = __commonJS((exports, module) => {
           throw new DOMException2(`Reason must be less than 123 bytes; received ${reasonByteLength}`, "SyntaxError");
         }
       }
-      if (this[kReadyState] === WebSocket.CLOSING || this[kReadyState] === WebSocket.CLOSED) {
-      } else if (!isEstablished(this)) {
+      if (this[kReadyState] === WebSocket.CLOSING || this[kReadyState] === WebSocket.CLOSED) {} else if (!isEstablished(this)) {
         failWebsocketConnection(this, "Connection was closed before it was established.");
         this[kReadyState] = WebSocket.CLOSING;
       } else if (!isClosing(this)) {
@@ -17022,8 +16982,7 @@ var require_lib = __commonJS((exports) => {
               response.result = obj;
             }
             response.headers = res.message.headers;
-          } catch (err) {
-          }
+          } catch (err) {}
           if (statusCode > 299) {
             let msg;
             if (obj && obj.message) {
@@ -18958,8 +18917,7 @@ var require_internal_path_helper = __commonJS((exports) => {
       }
     }
     assert_1.default(hasAbsoluteRoot(root), `ensureAbsoluteRoot parameter 'root' must have an absolute root`);
-    if (root.endsWith("/") || IS_WINDOWS && root.endsWith("\\")) {
-    } else {
+    if (root.endsWith("/") || IS_WINDOWS && root.endsWith("\\")) {} else {
       root += path.sep;
     }
     return root + itemPath;
@@ -19335,8 +19293,7 @@ var require_minimatch = __commonJS((exports, module) => {
   var path = function() {
     try {
       return __require("path");
-    } catch (e) {
-    }
+    } catch (e) {}
   }() || {
     sep: "/"
   };
@@ -19444,8 +19401,7 @@ var require_minimatch = __commonJS((exports, module) => {
     this.partial = !!options.partial;
     this.make();
   }
-  Minimatch.prototype.debug = function() {
-  };
+  Minimatch.prototype.debug = function() {};
   Minimatch.prototype.make = make;
   function make() {
     var pattern = this.pattern;
@@ -19567,7 +19523,7 @@ var require_minimatch = __commonJS((exports, module) => {
       }
     }
     for (var i = 0, len = pattern.length, c;i < len && (c = pattern.charAt(i)); i++) {
-      this.debug("%s\t%s %s %j", pattern, i, re, c);
+      this.debug("%s	%s %s %j", pattern, i, re, c);
       if (escaping && reSpecials[c]) {
         re += "\\" + c;
         escaping = false;
@@ -19586,7 +19542,7 @@ var require_minimatch = __commonJS((exports, module) => {
         case "+":
         case "@":
         case "!":
-          this.debug("%s\t%s %s %j <-- stateChar", pattern, i, re, c);
+          this.debug("%s	%s %s %j <-- stateChar", pattern, i, re, c);
           if (inClass) {
             this.debug("  in class");
             if (c === "!" && i === classStart + 1)
@@ -20527,8 +20483,7 @@ var require_semver = __commonJS((exports, module) => {
       console.log.apply(console, args);
     };
   } else {
-    debug = function() {
-    };
+    debug = function() {};
   }
   exports.SEMVER_SPEC_VERSION = "2.0.0";
   var MAX_LENGTH = 256;
@@ -24657,8 +24612,7 @@ var require_browser = __commonJS((exports, module) => {
     });
     args.splice(lastC, 0, c);
   }
-  exports.log = console.debug || console.log || (() => {
-  });
+  exports.log = console.debug || console.log || (() => {});
   function save(namespaces) {
     try {
       if (namespaces) {
@@ -24666,15 +24620,13 @@ var require_browser = __commonJS((exports, module) => {
       } else {
         exports.storage.removeItem("debug");
       }
-    } catch (error) {
-    }
+    } catch (error) {}
   }
   function load() {
     let r;
     try {
       r = exports.storage.getItem("debug");
-    } catch (error) {
-    }
+    } catch (error) {}
     if (!r && typeof process !== "undefined" && "env" in process) {
       r = process.env.DEBUG;
     }
@@ -24683,8 +24635,7 @@ var require_browser = __commonJS((exports, module) => {
   function localstorage() {
     try {
       return localStorage;
-    } catch (error) {
-    }
+    } catch (error) {}
   }
   module.exports = require_common()(exports);
   var { formatters } = module.exports;
@@ -24707,8 +24658,7 @@ var require_node = __commonJS((exports, module) => {
   exports.save = save;
   exports.load = load;
   exports.useColors = useColors;
-  exports.destroy = util.deprecate(() => {
-  }, "Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.");
+  exports.destroy = util.deprecate(() => {}, "Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.");
   exports.colors = [6, 2, 3, 4, 5, 1];
   try {
     const supportsColor = (()=>{throw new Error("Cannot require module "+"supports-color");})();
@@ -24792,8 +24742,7 @@ var require_node = __commonJS((exports, module) => {
         221
       ];
     }
-  } catch (error) {
-  }
+  } catch (error) {}
   exports.inspectOpts = Object.keys(process.env).filter((key) => {
     return /^debug_/i.test(key);
   }).reduce((obj, key) => {
@@ -25748,17 +25697,12 @@ var require_instrumenter = __commonJS((exports) => {
   var state_js_1 = require_state();
   function createDefaultTracingSpan() {
     return {
-      end: () => {
-      },
+      end: () => {},
       isRecording: () => false,
-      recordException: () => {
-      },
-      setAttribute: () => {
-      },
-      setStatus: () => {
-      },
-      addEvent: () => {
-      }
+      recordException: () => {},
+      setAttribute: () => {},
+      setStatus: () => {},
+      addEvent: () => {}
     };
   }
   function createDefaultInstrumenter() {
@@ -29026,8 +28970,7 @@ var require_util8 = __commonJS((exports) => {
       prepare() {
         throw new Error("WebResourceLike.prepare() is not supported by @azure/core-http-compat");
       },
-      validateRequestProperties() {
-      }
+      validateRequestProperties() {}
     };
     if (options === null || options === undefined ? undefined : options.createProxy) {
       return new Proxy(webResource, {
@@ -29275,8 +29218,7 @@ var require_requestPolicyFactoryPolicy = __commonJS((exports) => {
     HttpPipelineLogLevel2[HttpPipelineLogLevel2["WARNING"] = 2] = "WARNING";
   })(HttpPipelineLogLevel || (exports.HttpPipelineLogLevel = HttpPipelineLogLevel = {}));
   var mockRequestPolicyOptions = {
-    log(_logLevel, _message) {
-    },
+    log(_logLevel, _message) {},
     shouldLog(_logLevel) {
       return false;
     }
@@ -29499,8 +29441,7 @@ var require_validator = __commonJS((exports) => {
             }
             if (reachedRoot === true) {
               return getErrorObject("InvalidXml", "Multiple possible root nodes found.", getLineNumberForPosition(xmlData, i));
-            } else if (options.unpairedTags.indexOf(tagName) !== -1) {
-            } else {
+            } else if (options.unpairedTags.indexOf(tagName) !== -1) {} else {
               tags.push({ tagName, tagStartPos });
             }
             tagFound = true;
@@ -29610,8 +29551,7 @@ var require_validator = __commonJS((exports) => {
       if (xmlData[i] === doubleQuote || xmlData[i] === singleQuote) {
         if (startChar === "") {
           startChar = xmlData[i];
-        } else if (startChar !== xmlData[i]) {
-        } else {
+        } else if (startChar !== xmlData[i]) {} else {
           startChar = "";
         }
       } else if (xmlData[i] === ">") {
@@ -29923,8 +29863,7 @@ var require_strnum = __commonJS((exports, module) => {
         if (options.leadingZeros) {
           trimmedStr = (notation[1] || "") + notation[3];
         } else {
-          if (notation[2] === "0" && notation[3][0] === ".") {
-          } else {
+          if (notation[2] === "0" && notation[3][0] === ".") {} else {
             return str;
           }
         }
@@ -30210,8 +30149,7 @@ var require_OrderedObjParser = __commonJS((exports, module) => {
           if (!tagData)
             throw new Error("Pi Tag is not closed.");
           textData = this.saveTextToParentTag(textData, currentNode, jPath);
-          if (this.options.ignoreDeclaration && tagData.tagName === "?xml" || this.options.ignorePiTags) {
-          } else {
+          if (this.options.ignoreDeclaration && tagData.tagName === "?xml" || this.options.ignorePiTags) {} else {
             const childNode = new xmlNode(tagData.tagName);
             childNode.add(this.options.textNodeName, "");
             if (tagData.tagName !== tagData.tagExp && tagData.attrExpPresent) {
@@ -30337,8 +30275,7 @@ var require_OrderedObjParser = __commonJS((exports, module) => {
   };
   function addChild(currentNode, childNode, jPath) {
     const result = this.options.updateTag(childNode.tagname, jPath, childNode[":@"]);
-    if (result === false) {
-    } else if (typeof result === "string") {
+    if (result === false) {} else if (typeof result === "string") {
       childNode.tagname = result;
       currentNode.addChild(childNode);
     } else {
@@ -30618,8 +30555,7 @@ var require_XMLParser = __commonJS((exports, module) => {
       this.options = buildOptions(options);
     }
     parse(xmlData, validationOption) {
-      if (typeof xmlData === "string") {
-      } else if (xmlData.toString) {
+      if (typeof xmlData === "string") {} else if (xmlData.toString) {
         xmlData = xmlData.toString();
       } else {
         throw new Error("XML data is accepted in String or Bytes[] form.");
@@ -30902,8 +30838,7 @@ var require_json2xml = __commonJS((exports, module) => {
         let listTagAttr = "";
         for (let j = 0;j < arrLen; j++) {
           const item = jObj[key][j];
-          if (typeof item === "undefined") {
-          } else if (item === null) {
+          if (typeof item === "undefined") {} else if (item === null) {
             if (key[0] === "?")
               val += this.indentate(level) + "<" + key + "?" + this.tagEndChar;
             else
@@ -31818,8 +31753,7 @@ var require_operation3 = __commonJS((exports) => {
     setResult: (state, result) => state.result = result,
     setRunning: (state) => state.isStarted = true,
     setSucceeded: (state) => state.isCompleted = true,
-    setFailed: () => {
-    },
+    setFailed: () => {},
     getError: (state) => state.error,
     getResult: (state) => state.result,
     isCanceled: (state) => !!state.isCancelled,
@@ -31919,8 +31853,7 @@ var require_poller3 = __commonJS((exports) => {
         this.resolve = resolve;
         this.reject = reject;
       });
-      this.promise.catch(() => {
-      });
+      this.promise.catch(() => {});
     }
     async startPolling(pollOptions = {}) {
       if (this.stopped) {
@@ -33952,8 +33885,7 @@ ${key}:${decodeURIComponent(lowercaseQueries[key])}`;
       }
     };
     const mockRequestPolicyOptions = {
-      log(_logLevel, _message) {
-      },
+      log(_logLevel, _message) {},
       shouldLog(_logLevel) {
         return false;
       }
@@ -47969,8 +47901,7 @@ ${key}:${decodeURIComponent(lowercaseQueries[key])}`;
       const type = schema.type;
       try {
         return AvroType.fromStringSchema(type);
-      } catch (_a) {
-      }
+      } catch (_a) {}
       switch (type) {
         case AvroComplex.RECORD:
           if (schema.aliases) {
@@ -52993,7 +52924,7 @@ var require_config = __commonJS((exports) => {
 var require_package = __commonJS((exports, module) => {
   module.exports = {
     name: "@actions/cache",
-    version: "4.0.1",
+    version: "4.0.3",
     preview: true,
     description: "Actions cache lib",
     keywords: [
@@ -53042,6 +52973,7 @@ var require_package = __commonJS((exports, module) => {
       semver: "^6.3.1"
     },
     devDependencies: {
+      "@types/node": "^22.13.9",
       "@types/semver": "^6.0.0",
       typescript: "^5.2.2"
     }
@@ -53907,8 +53839,7 @@ var require_binary_reader = __commonJS((exports) => {
       let start = this.pos;
       switch (wireType) {
         case binary_format_contract_1.WireType.Varint:
-          while (this.buf[this.pos++] & 128) {
-          }
+          while (this.buf[this.pos++] & 128) {}
           break;
         case binary_format_contract_1.WireType.Bit64:
           this.pos += 4;
@@ -56160,8 +56091,7 @@ var require_deferred = __commonJS((exports) => {
         this._reject = reject;
       });
       if (preventUnhandledRejectionWarning) {
-        this._promise.catch((_) => {
-        });
+        this._promise.catch((_) => {});
       }
     }
     get state() {
@@ -56698,8 +56628,7 @@ var require_test_transport = __commonJS((exports) => {
     maybeSuppressUncaught(...promise) {
       if (this.suppressUncaughtRejections) {
         for (let p of promise) {
-          p.catch(() => {
-          });
+          p.catch(() => {});
         }
       }
     }
@@ -56708,36 +56637,28 @@ var require_test_transport = __commonJS((exports) => {
     }
     unary(method, input, options) {
       var _a;
-      const requestHeaders = (_a = options.meta) !== null && _a !== undefined ? _a : {}, headersPromise = this.promiseHeaders().then(delay(this.headerDelay, options.abort)), responsePromise = headersPromise.catch((_) => {
-      }).then(delay(this.responseDelay, options.abort)).then((_) => this.promiseSingleResponse(method)), statusPromise = responsePromise.catch((_) => {
-      }).then(delay(this.afterResponseDelay, options.abort)).then((_) => this.promiseStatus()), trailersPromise = responsePromise.catch((_) => {
-      }).then(delay(this.afterResponseDelay, options.abort)).then((_) => this.promiseTrailers());
+      const requestHeaders = (_a = options.meta) !== null && _a !== undefined ? _a : {}, headersPromise = this.promiseHeaders().then(delay(this.headerDelay, options.abort)), responsePromise = headersPromise.catch((_) => {}).then(delay(this.responseDelay, options.abort)).then((_) => this.promiseSingleResponse(method)), statusPromise = responsePromise.catch((_) => {}).then(delay(this.afterResponseDelay, options.abort)).then((_) => this.promiseStatus()), trailersPromise = responsePromise.catch((_) => {}).then(delay(this.afterResponseDelay, options.abort)).then((_) => this.promiseTrailers());
       this.maybeSuppressUncaught(statusPromise, trailersPromise);
       this.lastInput = { single: input };
       return new unary_call_1.UnaryCall(method, requestHeaders, input, headersPromise, responsePromise, statusPromise, trailersPromise);
     }
     serverStreaming(method, input, options) {
       var _a;
-      const requestHeaders = (_a = options.meta) !== null && _a !== undefined ? _a : {}, headersPromise = this.promiseHeaders().then(delay(this.headerDelay, options.abort)), outputStream = new rpc_output_stream_1.RpcOutputStreamController, responseStreamClosedPromise = headersPromise.then(delay(this.responseDelay, options.abort)).catch(() => {
-      }).then(() => this.streamResponses(method, outputStream, options.abort)).then(delay(this.afterResponseDelay, options.abort)), statusPromise = responseStreamClosedPromise.then(() => this.promiseStatus()), trailersPromise = responseStreamClosedPromise.then(() => this.promiseTrailers());
+      const requestHeaders = (_a = options.meta) !== null && _a !== undefined ? _a : {}, headersPromise = this.promiseHeaders().then(delay(this.headerDelay, options.abort)), outputStream = new rpc_output_stream_1.RpcOutputStreamController, responseStreamClosedPromise = headersPromise.then(delay(this.responseDelay, options.abort)).catch(() => {}).then(() => this.streamResponses(method, outputStream, options.abort)).then(delay(this.afterResponseDelay, options.abort)), statusPromise = responseStreamClosedPromise.then(() => this.promiseStatus()), trailersPromise = responseStreamClosedPromise.then(() => this.promiseTrailers());
       this.maybeSuppressUncaught(statusPromise, trailersPromise);
       this.lastInput = { single: input };
       return new server_streaming_call_1.ServerStreamingCall(method, requestHeaders, input, headersPromise, outputStream, statusPromise, trailersPromise);
     }
     clientStreaming(method, options) {
       var _a;
-      const requestHeaders = (_a = options.meta) !== null && _a !== undefined ? _a : {}, headersPromise = this.promiseHeaders().then(delay(this.headerDelay, options.abort)), responsePromise = headersPromise.catch((_) => {
-      }).then(delay(this.responseDelay, options.abort)).then((_) => this.promiseSingleResponse(method)), statusPromise = responsePromise.catch((_) => {
-      }).then(delay(this.afterResponseDelay, options.abort)).then((_) => this.promiseStatus()), trailersPromise = responsePromise.catch((_) => {
-      }).then(delay(this.afterResponseDelay, options.abort)).then((_) => this.promiseTrailers());
+      const requestHeaders = (_a = options.meta) !== null && _a !== undefined ? _a : {}, headersPromise = this.promiseHeaders().then(delay(this.headerDelay, options.abort)), responsePromise = headersPromise.catch((_) => {}).then(delay(this.responseDelay, options.abort)).then((_) => this.promiseSingleResponse(method)), statusPromise = responsePromise.catch((_) => {}).then(delay(this.afterResponseDelay, options.abort)).then((_) => this.promiseStatus()), trailersPromise = responsePromise.catch((_) => {}).then(delay(this.afterResponseDelay, options.abort)).then((_) => this.promiseTrailers());
       this.maybeSuppressUncaught(statusPromise, trailersPromise);
       this.lastInput = new TestInputStream(this.data, options.abort);
       return new client_streaming_call_1.ClientStreamingCall(method, requestHeaders, this.lastInput, headersPromise, responsePromise, statusPromise, trailersPromise);
     }
     duplex(method, options) {
       var _a;
-      const requestHeaders = (_a = options.meta) !== null && _a !== undefined ? _a : {}, headersPromise = this.promiseHeaders().then(delay(this.headerDelay, options.abort)), outputStream = new rpc_output_stream_1.RpcOutputStreamController, responseStreamClosedPromise = headersPromise.then(delay(this.responseDelay, options.abort)).catch(() => {
-      }).then(() => this.streamResponses(method, outputStream, options.abort)).then(delay(this.afterResponseDelay, options.abort)), statusPromise = responseStreamClosedPromise.then(() => this.promiseStatus()), trailersPromise = responseStreamClosedPromise.then(() => this.promiseTrailers());
+      const requestHeaders = (_a = options.meta) !== null && _a !== undefined ? _a : {}, headersPromise = this.promiseHeaders().then(delay(this.headerDelay, options.abort)), outputStream = new rpc_output_stream_1.RpcOutputStreamController, responseStreamClosedPromise = headersPromise.then(delay(this.responseDelay, options.abort)).catch(() => {}).then(() => this.streamResponses(method, outputStream, options.abort)).then(delay(this.afterResponseDelay, options.abort)), statusPromise = responseStreamClosedPromise.then(() => this.promiseStatus()), trailersPromise = responseStreamClosedPromise.then(() => this.promiseTrailers());
       this.maybeSuppressUncaught(statusPromise, trailersPromise);
       this.lastInput = new TestInputStream(this.data, options.abort);
       return new duplex_streaming_call_1.DuplexStreamingCall(method, requestHeaders, this.lastInput, headersPromise, outputStream, statusPromise, trailersPromise);
@@ -57526,6 +57447,41 @@ var require_cache_twirp_client = __commonJS((exports) => {
   exports.CacheServiceClientProtobuf = CacheServiceClientProtobuf;
 });
 
+// node_modules/@actions/cache/lib/internal/shared/util.js
+var require_util10 = __commonJS((exports) => {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.maskSecretUrls = exports.maskSigUrl = undefined;
+  var core_1 = require_core();
+  function maskSigUrl(url) {
+    if (!url)
+      return;
+    try {
+      const parsedUrl = new URL(url);
+      const signature = parsedUrl.searchParams.get("sig");
+      if (signature) {
+        (0, core_1.setSecret)(signature);
+        (0, core_1.setSecret)(encodeURIComponent(signature));
+      }
+    } catch (error) {
+      (0, core_1.debug)(`Failed to parse URL: ${url} ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+  exports.maskSigUrl = maskSigUrl;
+  function maskSecretUrls(body) {
+    if (typeof body !== "object" || body === null) {
+      (0, core_1.debug)("body is not an object or is null");
+      return;
+    }
+    if ("signed_upload_url" in body && typeof body.signed_upload_url === "string") {
+      maskSigUrl(body.signed_upload_url);
+    }
+    if ("signed_download_url" in body && typeof body.signed_download_url === "string") {
+      maskSigUrl(body.signed_download_url);
+    }
+  }
+  exports.maskSecretUrls = maskSecretUrls;
+});
+
 // node_modules/@actions/cache/lib/internal/shared/cacheTwirpClient.js
 var require_cacheTwirpClient = __commonJS((exports) => {
   var __awaiter = exports && exports.__awaiter || function(thisArg, _arguments, P, generator) {
@@ -57565,6 +57521,7 @@ var require_cacheTwirpClient = __commonJS((exports) => {
   var auth_1 = require_auth();
   var http_client_1 = require_lib();
   var cache_twirp_client_1 = require_cache_twirp_client();
+  var util_1 = require_util10();
 
   class CacheServiceClient {
     constructor(userAgent, maxAttempts, baseRetryIntervalMilliseconds, retryMultiplier) {
@@ -57617,6 +57574,7 @@ var require_cacheTwirpClient = __commonJS((exports) => {
             (0, core_1.debug)(`[Response] - ${response.message.statusCode}`);
             (0, core_1.debug)(`Headers: ${JSON.stringify(response.message.headers, null, 2)}`);
             const body = JSON.parse(rawBody);
+            (0, util_1.maskSecretUrls)(body);
             (0, core_1.debug)(`Body: ${JSON.stringify(body, null, 2)}`);
             if (this.isSuccessStatusCode(statusCode)) {
               return { response, body };
@@ -58143,7 +58101,7 @@ var require_cache3 = __commonJS((exports) => {
         };
         const response = yield twirpClient.GetCacheEntryDownloadURL(request);
         if (!response.ok) {
-          core.debug(`Cache not found for keys: ${keys.join(", ")}`);
+          core.debug(`Cache not found for version ${request.version} of keys: ${keys.join(", ")}`);
           return;
         }
         core.info(`Cache hit for: ${request.key}`);
@@ -58289,12 +58247,19 @@ var require_cache3 = __commonJS((exports) => {
           key,
           version
         };
-        const response = yield twirpClient.CreateCacheEntry(request);
-        if (!response.ok) {
+        let signedUploadUrl;
+        try {
+          const response = yield twirpClient.CreateCacheEntry(request);
+          if (!response.ok) {
+            throw new Error("Response was not ok");
+          }
+          signedUploadUrl = response.signedUploadUrl;
+        } catch (error) {
+          core.debug(`Failed to reserve cache: ${error}`);
           throw new ReserveCacheError(`Unable to reserve cache with key ${key}, another job may be creating this cache.`);
         }
         core.debug(`Attempting to upload cache located at: ${archivePath}`);
-        yield cacheHttpClient.saveCache(cacheId, archivePath, response.signedUploadUrl, options);
+        yield cacheHttpClient.saveCache(cacheId, archivePath, signedUploadUrl, options);
         const finalizeRequest = {
           key,
           version,
@@ -58482,8 +58447,7 @@ var require_internal_path_helper2 = __commonJS((exports) => {
       }
     }
     (0, assert_1.default)(hasAbsoluteRoot(root), `ensureAbsoluteRoot parameter 'root' must have an absolute root`);
-    if (root.endsWith("/") || IS_WINDOWS && root.endsWith("\\")) {
-    } else {
+    if (root.endsWith("/") || IS_WINDOWS && root.endsWith("\\")) {} else {
       root += path.sep;
     }
     return root + itemPath;
@@ -59416,29 +59380,56 @@ var require_glob2 = __commonJS((exports) => {
 var core = __toESM(require_core(), 1);
 var cache = __toESM(require_cache3(), 1);
 
-// src/utils/cache-keys.ts
+// src/utils/cache-options.ts
 var glob = __toESM(require_glob2(), 1);
 import path from "path";
 import fs from "fs/promises";
-var getFlutterVersion = async (fvmrcPath) => {
-  const workspaceDir = process.env.GITHUB_WORKSPACE;
-  fvmrcPath = path.resolve(workspaceDir, fvmrcPath);
-  const fvmrcContent = await fs.readFile(fvmrcPath, "utf-8");
-  return JSON.parse(fvmrcContent).flutter;
+var homeDir = process.env.HOME;
+var runnerOs = process.env.RUNNER_OS;
+var workspaceDir = process.env.GITHUB_WORKSPACE;
+var getFlutterVersion = async (projectDir) => {
+  const fvmrcPath = path.join(workspaceDir, projectDir, ".fvmrc");
+  let fvmrcContent;
+  try {
+    fvmrcContent = await fs.readFile(fvmrcPath, "utf-8");
+  } catch (e) {
+    throw new Error("Failed to read .fvmrc file. Make sure project-dir is set properly.", { cause: e });
+  }
+  try {
+    return JSON.parse(fvmrcContent).flutter;
+  } catch (e) {
+    throw new Error("Failed to parse .fvmrc. Make sure the file is valid JSON.", { cause: e });
+  }
 };
-var getCacheKeys = async (flutterProjectDir, flutterVersion) => {
-  const runnerOs = process.env.RUNNER_OS;
-  const workspaceDir = process.env.GITHUB_WORKSPACE;
+var getCacheOptions = async (projectDir, flutterVersion) => {
+  const pubspecHash = await glob.hashFiles("**/pubspec.lock", path.join(workspaceDir, projectDir));
   return {
-    flutterSdkCacheKey: `${runnerOs}-flutter-${flutterVersion}`,
-    flutterSdkRestoreCacheKeys: [`${runnerOs}-flutter-`],
-    pubCacheKey: `${runnerOs}-pub-${await glob.hashFiles("**/pubspec.lock", path.resolve(workspaceDir, flutterProjectDir))}`,
-    pubRestoreCacheKeys: [`${runnerOs}-pub-`]
+    flutterSdk: {
+      paths: [
+        path.join(homeDir, "fvm/versions", flutterVersion),
+        path.join(homeDir, "fvm/cache.git")
+      ],
+      cacheKey: `${runnerOs}-flutter-${flutterVersion}`,
+      restoreKeys: [`${runnerOs}-flutter-`]
+    },
+    pub: {
+      paths: [path.join(homeDir, ".pub-cache")],
+      cacheKey: `${runnerOs}-pub-${pubspecHash}`,
+      restoreKeys: [`${runnerOs}-pub-`]
+    }
   };
 };
 
 // src/post-impl.ts
-import path2 from "path";
+var saveCache2 = async (options, stateKey) => {
+  const cacheHit = core.getState(`${stateKey}-cache-hit`);
+  if (options.cacheKey === cacheHit) {
+    core.info("Skip saving cache as the cache key has not changed.");
+    return;
+  }
+  await cache.saveCache(options.paths, options.cacheKey);
+  core.info(`${stateKey} cache saved: ${options.cacheKey}`);
+};
 var postRun = async () => {
   try {
     if (core.getInput("cache") !== "true") {
@@ -59449,19 +59440,14 @@ var postRun = async () => {
       core.info("Saving cache is skipped because initializing FVM failed.");
       return;
     }
-    const homeDir = process.env.HOME;
-    const fvmrcPath = core.getInput("fvmrc-path");
     const projectDir = core.getInput("project-dir");
-    const flutterVersion = await getFlutterVersion(fvmrcPath);
-    const cacheKeys = await getCacheKeys(projectDir, flutterVersion);
-    await cache.saveCache([
-      path2.join(homeDir, "fvm/versions", flutterVersion),
-      path2.join(homeDir, "fvm/cache.git")
-    ], cacheKeys.flutterSdkCacheKey).then(() => {
-      core.info(`Flutter SDK cache saved: ${cacheKeys.flutterSdkCacheKey}`);
+    const flutterVersion = await getFlutterVersion(projectDir);
+    const cacheOptions = await getCacheOptions(projectDir, flutterVersion);
+    await core.group("Save Flutter SDK cache", () => {
+      return saveCache2(cacheOptions.flutterSdk, "flutter");
     });
-    await cache.saveCache([path2.join(homeDir, ".pub-cache")], cacheKeys.pubCacheKey).then(() => {
-      core.info(`Pub cache saved: ${cacheKeys.pubCacheKey}`);
+    await core.group("Save Pub cache", () => {
+      return saveCache2(cacheOptions.pub, "pub");
     });
   } catch (e) {
     core.setFailed(e.message);
