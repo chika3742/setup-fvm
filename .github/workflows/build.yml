@@ -35,6 +35,8 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           
+          git switch main
+          
           # 全変更ファイルをステージ
           git add .
           
@@ -43,7 +45,7 @@ jobs:
             git commit -m "chore: update build outputs [skip ci]"
             git tag ${{ github.ref_name }} --force
             git tag $(echo "${{ github.ref_name }}" | cut -d '.' -f 1) --force 
-            git push
+            git push origin HEAD:main
             git push --force --tags
           else
             echo "No changes to commit."
