@@ -4,7 +4,7 @@
     "": {
       "name": "setup-fvm",
       "dependencies": {
-        "@actions/cache": "^4.0.1",
+        "@actions/cache": "^4.0.3",
         "@actions/core": "^1.11.1",
         "@actions/exec": "^1.1.1",
         "@actions/glob": "^0.5.0",
@@ -18,7 +18,7 @@
     },
   },
   "packages": {
-    "@actions/cache": ["@actions/cache@4.0.1", "", { "dependencies": { "@actions/core": "^1.11.1", "@actions/exec": "^1.0.1", "@actions/glob": "^0.1.0", "@actions/http-client": "^2.1.1", "@actions/io": "^1.0.1", "@azure/abort-controller": "^1.1.0", "@azure/ms-rest-js": "^2.6.0", "@azure/storage-blob": "^12.13.0", "@protobuf-ts/plugin": "^2.9.4", "semver": "^6.3.1" } }, "sha512-u2NrTo95PDmk145wrr+fMhrvpF0hfPmD6cLkR7NozvNHqanR0BmRHBzEe1yiGZFFEHbu6/e6EOEX7qoM7fWVTA=="],
+    "@actions/cache": ["@actions/cache@4.0.3", "", { "dependencies": { "@actions/core": "^1.11.1", "@actions/exec": "^1.0.1", "@actions/glob": "^0.1.0", "@actions/http-client": "^2.1.1", "@actions/io": "^1.0.1", "@azure/abort-controller": "^1.1.0", "@azure/ms-rest-js": "^2.6.0", "@azure/storage-blob": "^12.13.0", "@protobuf-ts/plugin": "^2.9.4", "semver": "^6.3.1" } }, "sha512-SvrqFtYJ7I48A/uXNkoJrnukx5weQv1fGquhs3+4nkByZThBH109KTIqj5x/cGV7JGNvb8dLPVywUOqX1fjiXg=="],
 
     "@actions/core": ["@actions/core@1.11.1", "", { "dependencies": { "@actions/exec": "^1.1.1", "@actions/http-client": "^2.0.1" } }, "sha512-hXJCSrkwfA46Vd9Z3q4cpEpHB1rL5NG04+/rbqW9d3+CSvtB1tYe8UTpAlixa1vj0m/ULglfEK2UKxMGxCxv5A=="],
 
