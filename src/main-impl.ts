@@ -20,7 +20,7 @@ const restoreCache = async (options: CacheOptions, stateKey: string) => {
     options.restoreKeys,
   );
   if (!cacheHit) {
-    core.info("No Flutter SDK cache found");
+    core.info("No cache found");
     return;
   }
   core.saveState(`${stateKey}-cache-hit`, cacheHit);
