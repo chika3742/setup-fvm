@@ -23,6 +23,8 @@ jobs:
         with:
           project-dir: . # default
           cache: true # default
+
+      - run: fvm flutter --version
 ```
 
 ## Inputs
