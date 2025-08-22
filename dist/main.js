@@ -59481,10 +59481,13 @@ var mainRun = async () => {
     }
     await core.group("Install FVM", installFvm);
     await core.group("Run fvm use", async () => {
-      const fvmUseExitCode = await exec3.exec("fvm use", [], {
+      const fvmUseExitCode = await exec3.exec("fvm use --skip-pub-get", [], {
         cwd: path2.join(workspaceDir2, projectDir)
       });
-      core.saveState("fvm-use-success", fvmUseExitCode === 0);
+      const pubGetExitCode = await exec3.exec("fvm flutter pub get --enforce-lockfile", [], {
+        cwd: path2.join(workspaceDir2, projectDir)
+      });
+      core.saveState("fvm-use-success", fvmUseExitCode === 0 && pubGetExitCode === 0);
     });
   } catch (e) {
     core.setFailed(e.message);
