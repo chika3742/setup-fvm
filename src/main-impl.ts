@@ -59,10 +59,13 @@ export const mainRun = async () => {
 
     // install Flutter SDK and Pub dependencies
     await core.group("Run fvm use", async () => {
-      const fvmUseExitCode = await exec.exec("fvm use", [], {
+      const fvmUseExitCode = await exec.exec("fvm use --skip-pub-get", [], {
         cwd: path.join(workspaceDir, projectDir),
       });
-      core.saveState("fvm-use-success", fvmUseExitCode === 0);
+      const pubGetExitCode = await exec.exec("fvm flutter pub get --enforce-lockfile", [], {
+        cwd: path.join(workspaceDir, projectDir),
+      });
+      core.saveState("fvm-use-success", fvmUseExitCode === 0 && pubGetExitCode === 0);
     })
   } catch (e) {
     core.setFailed((e as any).message);
