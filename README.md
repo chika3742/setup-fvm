@@ -3,7 +3,7 @@
 This action performs the following tasks:
 
 - Installs FVM
-- Installs the Flutter SDK and pubspec dependencies (by running `fvm use`)
+- Installs Flutter SDK and run `fvm flutter pub get --enforce-lockfile`
 - Caches the Flutter SDK and Pub packages (can be disabled)
 
 Even if the job using this action fails, the cache will always be saved as long as this action itself succeeds.
