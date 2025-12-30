@@ -10,7 +10,8 @@ const workspaceDir = process.env.GITHUB_WORKSPACE!;
 const installFvm = async (): Promise<void> => {
   const result = await fetch("https://fvm.app/install.sh")
   const buffer = await result.arrayBuffer()
-  return execWithRetry("bash", { input: Buffer.from(buffer) }, "Failed to install FVM.");
+  await execWithRetry("bash", { input: Buffer.from(buffer) }, "Failed to install FVM.");
+  core.addPath(path.join(process.env.HOME!, "fvm/bin"))
 }
 
 const restoreCache = async (options: CacheOptions, stateKey: string) => {
