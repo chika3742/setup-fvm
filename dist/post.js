@@ -19523,7 +19523,7 @@ var require_minimatch = __commonJS((exports, module) => {
       }
     }
     for (var i = 0, len = pattern.length, c;i < len && (c = pattern.charAt(i)); i++) {
-      this.debug("%s	%s %s %j", pattern, i, re, c);
+      this.debug("%s\t%s %s %j", pattern, i, re, c);
       if (escaping && reSpecials[c]) {
         re += "\\" + c;
         escaping = false;
@@ -19542,7 +19542,7 @@ var require_minimatch = __commonJS((exports, module) => {
         case "+":
         case "@":
         case "!":
-          this.debug("%s	%s %s %j <-- stateChar", pattern, i, re, c);
+          this.debug("%s\t%s %s %j <-- stateChar", pattern, i, re, c);
           if (inClass) {
             this.debug("  in class");
             if (c === "!" && i === classStart + 1)
@@ -52924,7 +52924,7 @@ var require_config = __commonJS((exports) => {
 var require_package = __commonJS((exports, module) => {
   module.exports = {
     name: "@actions/cache",
-    version: "4.0.3",
+    version: "4.1.0",
     preview: true,
     description: "Actions cache lib",
     keywords: [
@@ -52964,17 +52964,18 @@ var require_package = __commonJS((exports, module) => {
       "@actions/core": "^1.11.1",
       "@actions/exec": "^1.0.1",
       "@actions/glob": "^0.1.0",
+      "@protobuf-ts/runtime-rpc": "^2.11.1",
       "@actions/http-client": "^2.1.1",
       "@actions/io": "^1.0.1",
       "@azure/abort-controller": "^1.1.0",
       "@azure/ms-rest-js": "^2.6.0",
       "@azure/storage-blob": "^12.13.0",
-      "@protobuf-ts/plugin": "^2.9.4",
       semver: "^6.3.1"
     },
     devDependencies: {
       "@types/node": "^22.13.9",
       "@types/semver": "^6.0.0",
+      "@protobuf-ts/plugin": "^2.9.4",
       typescript: "^5.2.2"
     }
   };
@@ -54662,12 +54663,16 @@ var require_reflection_json_reader = __commonJS((exports) => {
               target[localName] = field.T().internalJsonRead(jsonValue, options, target[localName]);
               break;
             case "enum":
+              if (jsonValue === null)
+                continue;
               let val = this.enum(field.T(), jsonValue, field.name, options.ignoreUnknownFields);
               if (val === false)
                 continue;
               target[localName] = val;
               break;
             case "scalar":
+              if (jsonValue === null)
+                continue;
               target[localName] = this.scalar(jsonValue, field.T, field.L, field.name);
               break;
           }
@@ -55590,6 +55595,7 @@ var require_message_type = __commonJS((exports) => {
   var binary_writer_1 = require_binary_writer();
   var binary_reader_1 = require_binary_reader();
   var baseDescriptors = Object.getOwnPropertyDescriptors(Object.getPrototypeOf({}));
+  var messageTypeDescriptor = baseDescriptors[message_type_contract_1.MESSAGE_TYPE] = {};
 
   class MessageType {
     constructor(name, fields, options) {
@@ -55597,7 +55603,8 @@ var require_message_type = __commonJS((exports) => {
       this.typeName = name;
       this.fields = fields.map(reflection_info_1.normalizeFieldInfo);
       this.options = options !== null && options !== undefined ? options : {};
-      this.messagePrototype = Object.create(null, Object.assign(Object.assign({}, baseDescriptors), { [message_type_contract_1.MESSAGE_TYPE]: { value: this } }));
+      messageTypeDescriptor.value = this;
+      this.messagePrototype = Object.create(null, baseDescriptors);
       this.refTypeCheck = new reflection_type_check_1.ReflectionTypeCheck(this);
       this.refJsonReader = new reflection_json_reader_1.ReflectionJsonReader(this);
       this.refJsonWriter = new reflection_json_writer_1.ReflectionJsonWriter(this);
@@ -56140,6 +56147,7 @@ var require_rpc_output_stream = __commonJS((exports) => {
         cmp: []
       };
       this._closed = false;
+      this._itState = { q: [] };
     }
     onNext(callback) {
       return this.addLis(callback, this._lis.nxt);
@@ -56200,9 +56208,6 @@ var require_rpc_output_stream = __commonJS((exports) => {
       this.clearLis();
     }
     [Symbol.asyncIterator]() {
-      if (!this._itState) {
-        this._itState = { q: [] };
-      }
       if (this._closed === true)
         this.pushIt({ value: null, done: true });
       else if (this._closed !== false)
@@ -56222,8 +56227,6 @@ var require_rpc_output_stream = __commonJS((exports) => {
     }
     pushIt(result) {
       let state = this._itState;
-      if (!state)
-        return;
       if (state.p) {
         const p = state.p;
         runtime_1.assert(p.state == deferred_1.DeferredState.PENDING, "iterator contract broken");
@@ -57098,11 +57101,12 @@ var require_cache2 = __commonJS((exports) => {
     constructor() {
       super("github.actions.results.api.v1.CreateCacheEntryResponse", [
         { no: 1, name: "ok", kind: "scalar", T: 8 },
-        { no: 2, name: "signed_upload_url", kind: "scalar", T: 9 }
+        { no: 2, name: "signed_upload_url", kind: "scalar", T: 9 },
+        { no: 3, name: "message", kind: "scalar", T: 9 }
       ]);
     }
     create(value) {
-      const message = { ok: false, signedUploadUrl: "" };
+      const message = { ok: false, signedUploadUrl: "", message: "" };
       globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
       if (value !== undefined)
         (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -57118,6 +57122,9 @@ var require_cache2 = __commonJS((exports) => {
             break;
           case 2:
             message.signedUploadUrl = reader.string();
+            break;
+          case 3:
+            message.message = reader.string();
             break;
           default:
             let u = options.readUnknownField;
@@ -57135,6 +57142,8 @@ var require_cache2 = __commonJS((exports) => {
         writer.tag(1, runtime_1.WireType.Varint).bool(message.ok);
       if (message.signedUploadUrl !== "")
         writer.tag(2, runtime_1.WireType.LengthDelimited).string(message.signedUploadUrl);
+      if (message.message !== "")
+        writer.tag(3, runtime_1.WireType.LengthDelimited).string(message.message);
       let u = options.writeUnknownFields;
       if (u !== false)
         (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -57208,11 +57217,12 @@ var require_cache2 = __commonJS((exports) => {
     constructor() {
       super("github.actions.results.api.v1.FinalizeCacheEntryUploadResponse", [
         { no: 1, name: "ok", kind: "scalar", T: 8 },
-        { no: 2, name: "entry_id", kind: "scalar", T: 3 }
+        { no: 2, name: "entry_id", kind: "scalar", T: 3 },
+        { no: 3, name: "message", kind: "scalar", T: 9 }
       ]);
     }
     create(value) {
-      const message = { ok: false, entryId: "0" };
+      const message = { ok: false, entryId: "0", message: "" };
       globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
       if (value !== undefined)
         (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -57228,6 +57238,9 @@ var require_cache2 = __commonJS((exports) => {
             break;
           case 2:
             message.entryId = reader.int64().toString();
+            break;
+          case 3:
+            message.message = reader.string();
             break;
           default:
             let u = options.readUnknownField;
@@ -57245,6 +57258,8 @@ var require_cache2 = __commonJS((exports) => {
         writer.tag(1, runtime_1.WireType.Varint).bool(message.ok);
       if (message.entryId !== "0")
         writer.tag(2, runtime_1.WireType.Varint).int64(message.entryId);
+      if (message.message !== "")
+        writer.tag(3, runtime_1.WireType.LengthDelimited).string(message.message);
       let u = options.writeUnknownFields;
       if (u !== false)
         (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -57963,7 +57978,7 @@ var require_cache3 = __commonJS((exports) => {
     });
   };
   Object.defineProperty(exports, "__esModule", { value: true });
-  exports.saveCache = exports.restoreCache = exports.isFeatureAvailable = exports.ReserveCacheError = exports.ValidationError = undefined;
+  exports.saveCache = exports.restoreCache = exports.isFeatureAvailable = exports.FinalizeCacheError = exports.ReserveCacheError = exports.ValidationError = undefined;
   var core = __importStar(require_core());
   var path = __importStar(__require("path"));
   var utils = __importStar(require_cacheUtils());
@@ -57971,7 +57986,7 @@ var require_cache3 = __commonJS((exports) => {
   var cacheTwirpClient = __importStar(require_cacheTwirpClient());
   var config_1 = require_config();
   var tar_1 = require_tar();
-  var constants_1 = require_constants6();
+  var http_client_1 = require_lib();
 
   class ValidationError extends Error {
     constructor(message) {
@@ -57990,6 +58005,15 @@ var require_cache3 = __commonJS((exports) => {
     }
   }
   exports.ReserveCacheError = ReserveCacheError;
+
+  class FinalizeCacheError extends Error {
+    constructor(message) {
+      super(message);
+      this.name = "FinalizeCacheError";
+      Object.setPrototypeOf(this, FinalizeCacheError.prototype);
+    }
+  }
+  exports.FinalizeCacheError = FinalizeCacheError;
   function checkPaths(paths) {
     if (!paths || paths.length === 0) {
       throw new ValidationError(`Path Validation Error: At least one directory or file path is required`);
@@ -58005,7 +58029,14 @@ var require_cache3 = __commonJS((exports) => {
     }
   }
   function isFeatureAvailable() {
-    return !!process.env["ACTIONS_CACHE_URL"];
+    const cacheServiceVersion = (0, config_1.getCacheServiceVersion)();
+    switch (cacheServiceVersion) {
+      case "v2":
+        return !!process.env["ACTIONS_RESULTS_URL"];
+      case "v1":
+      default:
+        return !!process.env["ACTIONS_CACHE_URL"];
+    }
   }
   exports.isFeatureAvailable = isFeatureAvailable;
   function restoreCache(paths, primaryKey, restoreKeys, options, enableCrossOsArchive = false) {
@@ -58065,7 +58096,11 @@ var require_cache3 = __commonJS((exports) => {
         if (typedError.name === ValidationError.name) {
           throw error;
         } else {
-          core.warning(`Failed to restore: ${error.message}`);
+          if (typedError instanceof http_client_1.HttpClientError && typeof typedError.statusCode === "number" && typedError.statusCode >= 500) {
+            core.error(`Failed to restore: ${error.message}`);
+          } else {
+            core.warning(`Failed to restore: ${error.message}`);
+          }
         }
       } finally {
         try {
@@ -58104,7 +58139,12 @@ var require_cache3 = __commonJS((exports) => {
           core.debug(`Cache not found for version ${request.version} of keys: ${keys.join(", ")}`);
           return;
         }
-        core.info(`Cache hit for: ${request.key}`);
+        const isRestoreKeyMatch = request.key !== response.matchedKey;
+        if (isRestoreKeyMatch) {
+          core.info(`Cache hit for restore-key: ${response.matchedKey}`);
+        } else {
+          core.info(`Cache hit for: ${response.matchedKey}`);
+        }
         if (options === null || options === undefined ? undefined : options.lookupOnly) {
           core.info("Lookup only - skipping download");
           return response.matchedKey;
@@ -58126,7 +58166,11 @@ var require_cache3 = __commonJS((exports) => {
         if (typedError.name === ValidationError.name) {
           throw error;
         } else {
-          core.warning(`Failed to restore: ${error.message}`);
+          if (typedError instanceof http_client_1.HttpClientError && typeof typedError.statusCode === "number" && typedError.statusCode >= 500) {
+            core.error(`Failed to restore: ${error.message}`);
+          } else {
+            core.warning(`Failed to restore: ${error.message}`);
+          }
         }
       } finally {
         try {
@@ -58203,7 +58247,11 @@ var require_cache3 = __commonJS((exports) => {
         } else if (typedError.name === ReserveCacheError.name) {
           core.info(`Failed to save: ${typedError.message}`);
         } else {
-          core.warning(`Failed to save: ${typedError.message}`);
+          if (typedError instanceof http_client_1.HttpClientError && typeof typedError.statusCode === "number" && typedError.statusCode >= 500) {
+            core.error(`Failed to save: ${typedError.message}`);
+          } else {
+            core.warning(`Failed to save: ${typedError.message}`);
+          }
         }
       } finally {
         try {
@@ -58237,9 +58285,6 @@ var require_cache3 = __commonJS((exports) => {
         }
         const archiveFileSize = utils.getArchiveFileSizeInBytes(archivePath);
         core.debug(`File Size: ${archiveFileSize}`);
-        if (archiveFileSize > constants_1.CacheFileSizeLimit && !(0, config_1.isGhes)()) {
-          throw new Error(`Cache size of ~${Math.round(archiveFileSize / (1024 * 1024))} MB (${archiveFileSize} B) is over the 10GB limit, not saving cache.`);
-        }
         options.archiveSizeBytes = archiveFileSize;
         core.debug("Reserving Cache");
         const version = utils.getCacheVersion(paths, compressionMethod, enableCrossOsArchive);
@@ -58251,7 +58296,10 @@ var require_cache3 = __commonJS((exports) => {
         try {
           const response = yield twirpClient.CreateCacheEntry(request);
           if (!response.ok) {
-            throw new Error("Response was not ok");
+            if (response.message) {
+              core.warning(`Cache reservation failed: ${response.message}`);
+            }
+            throw new Error(response.message || "Response was not ok");
           }
           signedUploadUrl = response.signedUploadUrl;
         } catch (error) {
@@ -58268,6 +58316,9 @@ var require_cache3 = __commonJS((exports) => {
         const finalizeResponse = yield twirpClient.FinalizeCacheEntryUpload(finalizeRequest);
         core.debug(`FinalizeCacheEntryUploadResponse: ${finalizeResponse.ok}`);
         if (!finalizeResponse.ok) {
+          if (finalizeResponse.message) {
+            throw new FinalizeCacheError(finalizeResponse.message);
+          }
           throw new Error(`Unable to finalize cache with key ${key}, another job may be finalizing this cache.`);
         }
         cacheId = parseInt(finalizeResponse.entryId);
@@ -58277,8 +58328,14 @@ var require_cache3 = __commonJS((exports) => {
           throw error;
         } else if (typedError.name === ReserveCacheError.name) {
           core.info(`Failed to save: ${typedError.message}`);
+        } else if (typedError.name === FinalizeCacheError.name) {
+          core.warning(typedError.message);
         } else {
-          core.warning(`Failed to save: ${typedError.message}`);
+          if (typedError instanceof http_client_1.HttpClientError && typeof typedError.statusCode === "number" && typedError.statusCode >= 500) {
+            core.error(`Failed to save: ${typedError.message}`);
+          } else {
+            core.warning(`Failed to save: ${typedError.message}`);
+          }
         }
       } finally {
         try {
