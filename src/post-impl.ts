@@ -19,9 +19,9 @@ export const postRun = async () => {
       return;
     }
 
-    // precondition: ensure fvm use was exited successfully
-    const fvmUseSuccess = core.getState("fvm-use-success");
-    if (fvmUseSuccess !== "true") {
+    // precondition: ensure fvm install was exited successfully
+    const fvmInstallSuccess = core.getState("fvm-install-success");
+    if (fvmInstallSuccess !== "true") {
       core.info("Saving cache is skipped because initializing FVM failed.");
       return;
     }
