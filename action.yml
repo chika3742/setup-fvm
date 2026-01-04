@@ -22,6 +22,6 @@ outputs:
     description: The key for the cache hit if Pub packages cache.
 
 runs:
-  using: node20
+  using: node24
   main: dist/main.js
   post: dist/post.js
