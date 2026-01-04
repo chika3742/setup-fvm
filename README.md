@@ -16,7 +16,7 @@ jobs:
   foo:
     # ...
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Initialize Flutter SDK
         uses: chika3742/setup-fvm@v3
