@@ -3,7 +3,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "bun build --target=node --outdir=dist --minify ./src/main.ts ./src/post.ts"
+    "build": "bun build --target=node --outdir=dist ./src/main.ts ./src/post.ts"
   },
   "devDependencies": {
     "@types/bun": "latest"
