@@ -1,0 +1,22 @@
+name: test.yml
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: chika3742/setup-fvm@main
+        with:
+          project-dir: test_fixture
+
+      - run: fvm flutter --version
+        working-directory: test_fixture
+
