@@ -22,6 +22,7 @@ jobs:
         uses: chika3742/setup-fvm@v3
         with:
           project-dir: . # default
+          fvm-version: 4 # default
           cache: true # default
 
       - run: fvm flutter --version
@@ -32,6 +33,14 @@ jobs:
 ### `project-dir`
 
 **Optional** Path to the Flutter project root directory. Defaults to `.`.
+
+### `fvm-version`
+
+**Optional** FVM version to install. Defaults to `4` (the latest 4.x release).
+
+- Exact version: `4.1.2`
+- Prefix: `4`, `4.1`, `4.x`, `4.1.x` (the latest stable release that matches)
+- `latest`: the latest release
 
 ### `cache`
 
