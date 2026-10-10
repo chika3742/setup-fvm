@@ -3,14 +3,17 @@ import * as cache from '@actions/cache';
 import * as exec from '@actions/exec';
 import { type CacheOptions, getCacheOptions, getFlutterVersion } from "./utils/cache-options.ts";
 import { execWithRetry } from "./utils/exec-with-retry.ts";
+import { resolveFvmVersion } from "./utils/fvm-version.ts";
 import * as path from "path";
 
 const workspaceDir = process.env.GITHUB_WORKSPACE!;
 
-const installFvm = async (): Promise<void> => {
+const installFvm = async (versionSpec: string): Promise<void> => {
+  const version = await resolveFvmVersion(versionSpec);
+  core.info(`Installing FVM ${version ?? "latest"}`);
   const result = await fetch("https://fvm.app/install.sh")
   const buffer = await result.arrayBuffer()
-  await execWithRetry("bash", { input: Buffer.from(buffer) }, "Failed to install FVM.");
+  await execWithRetry(version ? `bash -s -- ${version}` : "bash", { input: Buffer.from(buffer) }, "Failed to install FVM.");
   core.addPath(path.join(process.env.HOME!, "fvm/bin"))
 }
 
@@ -33,6 +36,7 @@ export const mainRun = async () => {
     // inputs
     const projectDir = core.getInput("project-dir");
     const cacheEnabled = core.getInput("cache") === "true";
+    const fvmVersion = core.getInput("fvm-version");
 
     // restore caches
     if (cacheEnabled) {
@@ -56,7 +60,7 @@ export const mainRun = async () => {
       })
     }
 
-    await core.group("Install FVM", installFvm);
+    await core.group("Install FVM", () => installFvm(fvmVersion));
 
     // install Flutter SDK and Pub dependencies
     await core.group("Install Flutter SDK", async () => {

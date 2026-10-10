@@ -10,6 +10,10 @@ inputs:
     description: Path to the Flutter project root.
     required: false
     default: "."
+  fvm-version:
+    description: 'FVM version to install. Accepts an exact version (e.g. "4.1.2"), a prefix (e.g. "4" or "4.1.x") to use the latest matching release, or "latest".'
+    required: false
+    default: "4"
   cache:
     description: Whether to cache Flutter SDK and Pub packages (in ~/.pub-cache).
     required: false
