@@ -20,10 +20,10 @@ jobs:
 
       - name: Initialize Flutter SDK
         uses: chika3742/setup-fvm@v3
-        with:
-          project-dir: . # default
-          fvm-version: 4 # default
-          cache: true # default
+        with: # defaults
+          project-dir: .
+          fvm-version: 4
+          cache: true
 
       - run: fvm flutter --version
 ```
