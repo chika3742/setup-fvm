@@ -1,6 +1,6 @@
 import * as exec from "@actions/exec";
 
-const FVM_REPO_URL = "https://github.com/leoafarias/fvm";
+const FVM_REPO_URL = "https://github.com/btwld/fvm";
 
 const parse = (v: string) => v.split(".").map(Number);
 
